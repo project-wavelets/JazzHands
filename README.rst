@@ -6,6 +6,12 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
     :alt: Powered by Astropy Badge
 
 
+Authors
+-------
+
+This project is made by Trevor Dorn-Wallenstein, YOUR NAME HERE
+
+
 License
 -------
 
