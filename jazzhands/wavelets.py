@@ -213,11 +213,11 @@ class WaveletTransformer:
             S-matrix; size len(func_vals)xlen(func_vals)
 
         """
-        return np.matrix(
-            np.array([[
-                self._inner_product(func1, func2, weights)
-                for func1 in func_vals
-            ] for func2 in func_vals]))
+        S = np.array([[
+            self._inner_product(func1, func2, weights) for func1 in func_vals
+        ] for func2 in func_vals])
+
+        return np.matrix(S)
 
     def _calc_coeffs(self, func_vals, weights, data):
         """
@@ -411,7 +411,7 @@ class WaveletTransformer:
             ) - 1 if n_processes is None else n_processes
 
             args = np.array([[exclude, tau, omega] for omega in self._omegas
-                             for tau in self._taus])
+                             for tau in tqdm(self._taus)])
 
             with mp.Pool(processes=n_processes) as pool:
                 results = pool.starmap(
@@ -425,9 +425,10 @@ class WaveletTransformer:
                 wwa = transform[:, :, 1]
 
         else:
-            transform = np.array(
-                [[self._wavelet_transform(exclude, tau, omega)]
-                 for omega in self._omegas for tau in tqdm(self._taus)])
+            transform = np.array([[
+                self._wavelet_transform(exclude, tau, omega)
+                for omega in self._omegas
+            ] for tau in tqdm(self._taus)])
 
             wwz = transform[:, :, 0].T
             wwa = transform[:, :, 1].T
