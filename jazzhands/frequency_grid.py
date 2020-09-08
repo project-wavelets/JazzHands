@@ -59,13 +59,13 @@ def _omegas_taus_from_min_max_nu(nu_min, nu_max, tau_min, tau_max, resolution_fa
     
     delta_log_omega = np.log2(1.0 + (np.sqrt(2.0*c) / resolution_factor))
     
-    n_omega = (log_omega_max - log_omega_min) / delta_log_omega + 1
+    n_omega = int((log_omega_max - log_omega_min) / delta_log_omega) + 1
     
     omegas = np.logspace(log_omega_min, log_omega_max, n_omega, base=2)
     
     dt_max = 1.0 / (2 * np.pi * nu_max * np.sqrt(2.0*c))
     
-    n_tau = resolution_factor*(tau_max - tau_min)/dt_max + 1
+    n_tau = int(resolution_factor*(tau_max - tau_min)/dt_max) + 1
     
     taus= np.linspace(tau_min, tau_max, n_tau)
     
