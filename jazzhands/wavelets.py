@@ -5,10 +5,10 @@ Based on Foster 1996
 """
 import numpy as np
 
-__all__ = ['Wavelet']
+__all__ = ['WaveletTransformer']
 
 
-class Wavelet:
+class WaveletTransformer:
     """
     Calculate the Weighted Wavelet Transform of the data `y`, measured at
     times `t`, evaluated at a wavelet scale $\omega$ and shift $\tau$, for a
@@ -42,11 +42,11 @@ class Wavelet:
 
         self.func_list = func_list
         self.f1 = f1
-        self.data = np.asarray(data)
-        self.time = np.asarray(time)
-        self.omegas = np.asarray(omegas)
-        self.taus = np.asarray(taus)
-        self.c = c
+        self._data = np.asarray(data)
+        self._time = np.asarray(time)
+        self._omegas = np.asarray(omegas)
+        self._taus = np.asarray(taus)
+        self._c = c
 
     def _weight_alpha(self, time, omega, tau, c):
         """
@@ -137,8 +137,9 @@ class Wavelet:
             Column vector where phi_y_i = phi_i * data
 
         """
-        return np.array(
-            [[self._inner_product(func, data, ws) for func in func_vals]]).T
+        return np.array([[
+            self._inner_product(func, data, weights) for func in func_vals
+        ]]).T
 
     def _S_matrix(self, func_vals, weights):
         """
@@ -189,7 +190,7 @@ class Wavelet:
 
         """
         S_m = self._S_matrix(func_vals, weights)
-        phi_y = self._inner_product_vector(func_vals, weightsws, data)
+        phi_y = self._inner_product_vector(func_vals, weights, data)
 
         return np.linalg.solve(S_m, phi_y).T
 
@@ -274,17 +275,20 @@ class Wavelet:
             Coefficients from `coeffs`
 
         """
-        y_f, y_coeffs = _y_fit(func_vals, ws, data)
+        y_f, y_coeffs = self._y_fit(func_vals, weights, data)
 
-        return self._inner_product(y_f, y_f, ws) - np.power(
-            self._inner_product(f1_vals, y_f, ws), 2.0), y_coeffs
+        return self._inner_product(y_f, y_f, weights) - np.power(
+            self._inner_product(f1_vals, y_f, weights), 2.0), y_coeffs
 
-    def _wavelet_transform(self, tau, omega):
+    def _wavelet_transform(self, exclude, tau, omega):
         """
         Internal function to compute wavelet for one tau, omega pair.
 
         Parameters
-        ---------_
+        ----------
+        exclude : bool
+            If exclude is True, returns 0 if the nearest data point is more than one cycle away. Default True.
+
         omega : float
             angular frequency in radians per unit time.
 
@@ -300,19 +304,21 @@ class Wavelet:
             Corresponding amplitude of the signal at the given frequency/time
 
         """
-        if exclude and (np.min(np.abs(self.time - tau)) > 2.0 * np.pi / omega):
+        if exclude and (np.min(np.abs(self._time - tau)) >
+                        2.0 * np.pi / omega):
             return 0.0, 0.0
 
-        weights = self._weight_alpha(self.time, omega, tau, self.c)
+        weights = self._weight_alpha(self._time, omega, tau, self._c)
         num_pts = self._n_points(weights)
 
         func_vals = np.array(
-            [func(self.time, self.omega, tau) for func in self.func_list])
+            [func(self._time, omega, tau) for func in self.func_list])
 
-        f1_vals = self.f1(self.time, omega, tau)
+        f1_vals = self.f1(self._time, omega, tau)
 
-        x_var = self._weight_var_x(f1_vals, ws, self.data)
-        y_var, y_coeff = self._weight_var_y(func_vals, f1_vals, ws, self.data)
+        x_var = self._weight_var_x(f1_vals, weights, self._data)
+        y_var, y_coeff = self._weight_var_y(func_vals, f1_vals, weights,
+                                            self._data)
         y_coeff_rows = y_coeff[0]
 
         return ((num_pts - 3.0) * y_var) / (2.0 * (x_var - y_var)), np.sqrt(
@@ -352,24 +358,24 @@ class Wavelet:
             n_processes = multiprocessing.cpu_count(
             ) - 1 if n_processes is None else n_processes
 
-            args = np.array([[tau, omega] for omega in self.omegas
-                             for tau in self.taus])
+            args = np.array([[exclude, tau, omega] for omega in self._omegas
+                             for tau in self._taus])
 
             with mp.Pool(processes=n_processes) as pool:
                 results = pool.starmap(
                     self._wavelet_transform,
                     args,
-                    chunksize=int(len(self.omegas) * len(self.taus) / 10))
+                    chunksize=int(len(self._omegas) * len(self._taus) / 10))
 
-                transform = np.array(results).reshape(len(self.omegas),
-                                                      len(self.taus), 2)
+                transform = np.array(results).reshape(len(self._omegas),
+                                                      len(self._taus), 2)
                 wwz = transform[:, :, 0]
                 wwa = transform[:, :, 1]
 
         else:
-            transform = np.array([[self._wavelet_transform(tau, omega)]
-                                  for omega in self.omegas
-                                  for tau in tqdm(self.taus)])
+            transform = np.array(
+                [[self._wavelet_transform(exclude, tau, omega)]
+                 for omega in self._omegas for tau in tqdm(self._taus)])
 
             wwz = transform[:, :, 0].T
             wwa = transform[:, :, 1].T
