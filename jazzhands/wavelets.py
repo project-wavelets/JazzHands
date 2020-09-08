@@ -1,7 +1,7 @@
 """
 Definition of :class::class:`Wavelets`.
-:class::class:`Wavelets` is used to create a WAVELET TRANSFORM from a _____,
-BASED ON FOSTER 1996
+:class::class:`Wavelets` is used to create a WAVELET TRANSFORM,
+Based on Foster 1996
 """
 import numpy as np
 import scipy
@@ -361,16 +361,7 @@ def arg_wrapper(args):
     return WWZ(*args)
 
 
-def MP_WWZ(func_list,
-           f1,
-           y,
-           t,
-           omegas,
-           taus,
-           c=0.0125,
-           exclude=True,
-           mp=True,
-           n_processes=None):
+def MP_WWZ(func_list, f1, y, t, omegas, taus, c=0.0125, exclude=True, mp=True, n_processes=None):
     """
     Calculate the Weighted Wavelet Transform of the data `y`, measured at times `t`,
     evaluated on a grid of wavelet scales `omegas` and shifts `taus`, for a decay factor of
