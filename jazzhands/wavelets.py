@@ -48,7 +48,7 @@ class Wavelet:
         self.taus = np.asarray(taus)
         self.c = c
 
-    def _weight_alpha(time, omega, tau, c):
+    def _weight_alpha(self, time, omega, tau, c):
         """
         Weighting function for each point at a given omega and tau; (5-3) in Foster (1996).
 
@@ -74,7 +74,7 @@ class Wavelet:
         """
         return np.exp(-c * np.power(omega * (time - tau), 2.0))
 
-    def _n_points(weights):
+    def _n_points(self, weights):
         """
         Effective number of points contributing to the transform; (5-4) in Foster (1996).
 
@@ -91,7 +91,7 @@ class Wavelet:
         """
         return np.power(np.sum(weights), 2.0) / np.sum(np.power(weights, 2.0))
 
-    def _inner_product(func1, func2, weights):
+    def _inner_product(self, func1, func2, weights):
         """
         Define the inner product of two functions; (4-2) in Foster (1996)
 
@@ -114,7 +114,7 @@ class Wavelet:
         """
         return np.sum(weights * func1 * func2) / np.sum(weights)
 
-    def _inner_product_vector(func_vals, weights, data):
+    def _inner_product_vector(self, func_vals, weights, data):
         """
         Generates a column vector consisting of the inner products between the basis
         functions and the observed data
@@ -138,9 +138,9 @@ class Wavelet:
 
         """
         return np.array(
-            [[_inner_product(func, data, ws) for func in func_vals]]).T
+            [[self._inner_product(func, data, ws) for func in func_vals]]).T
 
-    def _S_matrix(func_vals, weights):
+    def _S_matrix(self, func_vals, weights):
         """
         Define the S-matrix; (4-2) in Foster (1996)
         Takes the values of the functions already evaluated at the times of observations.
@@ -162,10 +162,11 @@ class Wavelet:
         """
         return np.matrix(
             np.array([[
-                _inner_product(func1, func2, weights) for func1 in func_vals
+                self._inner_product(func1, func2, weights)
+                for func1 in func_vals
             ] for func2 in func_vals]))
 
-    def _calc_coeffs(func_vals, weights, data):
+    def _calc_coeffs(self, func_vals, weights, data):
         """
         Calculate the coefficients of each $\phi$. Adapted from (4-4) in Foster (1996).
 
@@ -187,12 +188,12 @@ class Wavelet:
             Contains coefficients for each basis function
 
         """
-        S_m = _S_matrix(func_vals, weights)
-        phi_y = _inner_product_vector(func_vals, weightsws, data)
+        S_m = self._S_matrix(func_vals, weights)
+        phi_y = self._inner_product_vector(func_vals, weightsws, data)
 
         return np.linalg.solve(S_m, phi_y).T
 
-    def _weight_var_x(f1_vals, weights, data):
+    def _weight_var_x(self, f1_vals, weights, data):
         """
         Calculate the weighted variation of the data. Adapted from (5-9) in Foster (1996).
 
@@ -214,10 +215,10 @@ class Wavelet:
             Weighted variation of the data
 
         """
-        return _inner_product(data, data, weights) - np.power(
-            _inner_product(f1_vals, data, weights), 2.0)
+        return self._inner_product(data, data, weights) - np.power(
+            self._inner_product(f1_vals, data, weights), 2.0)
 
-    def _y_fit(func_vals, weights, data):
+    def _y_fit(self, func_vals, weights, data):
         """
         Calculate the value of the model.
 
@@ -242,11 +243,11 @@ class Wavelet:
             The coefficients returned by `coeffs`
 
         """
-        y_coeffs = _calc_coeffs(func_vals, weights, data)
+        y_coeffs = self._calc_coeffs(func_vals, weights, data)
 
         return y_coeffs.dot(func_vals), y_coeffs
 
-    def _weight_var_y(func_vals, f1_vals, weights, data):
+    def _weight_var_y(self, func_vals, f1_vals, weights, data):
         """
         Calculate the weighted variation of the model. Adapted from (5-10) in Foster (1996).
 
@@ -275,10 +276,10 @@ class Wavelet:
         """
         y_f, y_coeffs = _y_fit(func_vals, ws, data)
 
-        return _inner_product(y_f, y_f, ws) - np.power(
-            _inner_product(f1_vals, y_f, ws), 2.0), y_coeffs
+        return self._inner_product(y_f, y_f, ws) - np.power(
+            self._inner_product(f1_vals, y_f, ws), 2.0), y_coeffs
 
-    def _wavelet_transform(tau, omega):
+    def _wavelet_transform(self, tau, omega):
         """
         Internal function to compute wavelet for one tau, omega pair.
 
@@ -302,22 +303,22 @@ class Wavelet:
         if exclude and (np.min(np.abs(self.time - tau)) > 2.0 * np.pi / omega):
             return 0.0, 0.0
 
-        weights = _weight_alpha(self.time, omega, tau, self.c)
-        num_pts = _n_points(weights)
+        weights = self._weight_alpha(self.time, omega, tau, self.c)
+        num_pts = self._n_points(weights)
 
         func_vals = np.array(
             [func(self.time, self.omega, tau) for func in self.func_list])
 
         f1_vals = self.f1(self.time, omega, tau)
 
-        x_var = _weight_var_x(f1_vals, ws, self.data)
-        y_var, y_coeff = _weight_var_y(func_vals, f1_vals, ws, self.data)
+        x_var = self._weight_var_x(f1_vals, ws, self.data)
+        y_var, y_coeff = self._weight_var_y(func_vals, f1_vals, ws, self.data)
         y_coeff_rows = y_coeff[0]
 
         return ((num_pts - 3.0) * y_var) / (2.0 * (x_var - y_var)), np.sqrt(
             np.power(y_coeff_rows[1], 2.0) + np.power(y_coeff_rows[2], 2.0))
 
-    def compute_wavelet(exclude=True, parallel=False, n_processes=False):
+    def compute_wavelet(self, exclude=True, parallel=False, n_processes=False):
         """
         Calculate the Weighted Wavelet Transform of the object.
 
@@ -356,7 +357,7 @@ class Wavelet:
 
             with mp.Pool(processes=n_processes) as pool:
                 results = pool.starmap(
-                    _wavelet_transform,
+                    self._wavelet_transform,
                     args,
                     chunksize=int(len(self.omegas) * len(self.taus) / 10))
 
@@ -366,7 +367,7 @@ class Wavelet:
                 wwa = transform[:, :, 1]
 
         else:
-            transform = np.array([[_wavelet_transform(tau, omega)]
+            transform = np.array([[self._wavelet_transform(tau, omega)]
                                   for omega in self.omegas
                                   for tau in tqdm(self.taus)])
 
