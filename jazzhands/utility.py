@@ -24,7 +24,7 @@ def phi_1(time, omega, tau):
         array of 1s of length time
 
     """
-    return np.ones(len(t))
+    return np.ones(len(time))
 
 
 def phi_2(time, omega, tau):
