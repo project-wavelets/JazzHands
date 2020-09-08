@@ -17,12 +17,15 @@ Contents
 Using ``JazzHands``
 -------------------
 
-A basic usage example is as follows:
+Let's go through a basic usage example with some synthetic data. First, we're
+going to generate a sin wave with a frequency one 1 and amplitude of 1, 
+randomly sampled over 10 periods, with some Gaussian noise added in:
 
 .. code-block:: python
 
     >>> from jazzhands import *
         import numpy as np
+        import matplotlib.pyplot as plt
     
     >>> t_obs = np.random.uniform(0,10,1000).sort() #Generate synthetic data
     
@@ -30,7 +33,13 @@ A basic usage example is as follows:
     
     >>> f_obs += 0.1*np.random.randn(len(f_obs)) #Add in some Gaussian noise
 
-    >>> print([1,2,3]) #until we have the wavelet code up and running
+    >>> plt.scatter(t_obs, f_obs)
+    
+    >>> plt.xlim('Time')
+    
+    >>> plt.ylim('Flux')
+    
+Now let's initialize a WHATEVER WE CALL IT object with our data
 
 
 
