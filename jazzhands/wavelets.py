@@ -46,7 +46,59 @@ class WaveletTransformer:
         self._time = np.asarray(time)
         self._omegas = np.asarray(omegas)
         self._taus = np.asarray(taus)
-        self._c = c
+        self.c = c
+
+    @property
+    def data(self):
+        return self._data
+
+    @data.setter
+    def data(self, new_data):
+        new_data = np.asarray(new_data)
+        if not new_data.shape == self._data.shape:
+            raise ValueError('Can only assign new data of the same shape as '
+                             'the original array')
+
+        self._data = new_data
+
+    @property
+    def time(self):
+        return self._time
+
+    @time.setter
+    def time(self, new_time):
+        new_time = np.asarray(new_time)
+        if not new_time.shape == self._time.shape:
+            raise ValueError('Can only assign new time of the same shape as '
+                             'the original array')
+
+        self._time = new_time
+
+    @property
+    def omegas(self):
+        return self._omegas
+
+    @omegas.setter
+    def omegas(self, new_omegas):
+        new_omegas = np.asarray(new_omegas)
+        if not new_omegas.shape == self._omegas.shape:
+            raise ValueError('Can only assign new data of the same shape as '
+                             'the original array')
+
+        self._omegas = new_omegas
+
+    @property
+    def taus(self):
+        return self._taus
+
+    @taus.setter
+    def taus(self, new_taus):
+        new_taus = np.asarray(new_taus)
+        if not new_taus.shape == self._taus.shape:
+            raise ValueError('Can only assign new data of the same shape as '
+                             'the original array')
+
+        self._taus = new_taus
 
     def _weight_alpha(self, time, omega, tau, c):
         """
@@ -308,7 +360,7 @@ class WaveletTransformer:
                         2.0 * np.pi / omega):
             return 0.0, 0.0
 
-        weights = self._weight_alpha(self._time, omega, tau, self._c)
+        weights = self._weight_alpha(self._time, omega, tau, self.c)
         num_pts = self._n_points(weights)
 
         func_vals = np.array(
