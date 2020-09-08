@@ -1,3 +1,6 @@
+import numpy as np
+import scipy
+
 __all__ = ['phi_1', 'phi_2', 'phi_3', 'w_alpha', 'N_eff', 'function_inner_product', 'S_matrix', 'inner_product_vector',
            'coeffs', 'y_fit', 'V_x', 'V_y', 'WWZ'] #function names that get imported
 
