@@ -583,3 +583,31 @@ class WaveletTransformer:
         wwz, wwa = self.compute_wavelet()
         
         return omegas, taus, wwz, wwa
+    
+    def resolution(self, nu):
+        """
+        Calculates the resolution of the Morlet wavelet in time and frequency 
+        as a function of frequency
+        
+        Parameter
+        ---------
+        nu : float
+            Frequency
+            
+        Result
+        ------
+        delta_tau : float
+            Time resolution
+        delta_nu : float
+            Frequency resolution
+        """
+        
+        omega = 2.0 * np.pi * nu
+    
+        dw = omega*np.sqrt(2.0*self.c)
+    
+        dt = 1.0/dw
+        
+        dnu = dw / 2.0 / np.pi
+    
+        return dt, dnu
