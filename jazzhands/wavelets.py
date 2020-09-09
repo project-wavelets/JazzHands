@@ -5,6 +5,8 @@ Based on Foster 1996
 """
 import numpy as np
 
+from .mother_wavelets import Morlet
+
 __all__ = ['WaveletTransformer']
 
 
@@ -30,7 +32,7 @@ class WaveletTransformer:
     c : float
         Decay rate of Gaussian envelope of wavelet. Default 0.0125
     """
-    def __init__(self, func_list, f1, data, time, omegas, taus, c=0.0125):
+    def __init__(self, func_list, f1, data, time, omegas, taus, mother_wavelet='Morlet', c=0.0125):
 
         self.func_list = func_list
         self.f1 = f1
@@ -39,6 +41,11 @@ class WaveletTransformer:
         self._omegas = np.asarray(omegas)
         self._taus = np.asarray(taus)
         self.c = c
+
+        # Mother wavelet
+        if mother_wavelet == 'Morlet':
+            self.mother_wavelet = Morlet(c=c)
+            self._weight_alpha = self.mother_wavelet.weights
 
     @property
     def data(self):
@@ -92,25 +99,25 @@ class WaveletTransformer:
 
         self._taus = new_taus
 
-    def _weight_alpha(self, time, omega, tau, c):
-        """
-        Weighting function for each point at a given omega and tau; (5-3) in Foster (1996).
-        Parameters
-        ----------
-        time : array-like
-            times of observations
-        omega : float
-            angular frequency in radians per unit time.
-        tau : float
-            time shift in same units as t
-        c : float
-            Decay constant of the Gaussian envelope for the wavelet
-        Returns
-        -------
-        array-like
-            Statistical weights of data points
-        """
-        return np.exp(-c * np.power(omega * (time - tau), 2.0))
+    #def _weight_alpha(self, time, omega, tau, c):
+    #    """
+    #    Weighting function for each point at a given omega and tau; (5-3) in Foster (1996).
+    #    Parameters
+    #    ----------
+    #    time : array-like
+    #        times of observations
+    #    omega : float
+    #        angular frequency in radians per unit time.
+    #    tau : float
+    #        time shift in same units as t
+    #    c : float
+    #        Decay constant of the Gaussian envelope for the wavelet
+    #    Returns
+    #    -------
+    #    array-like
+    #        Statistical weights of data points
+    #    """
+    #    return np.exp(-c * np.power(omega * (time - tau), 2.0))
 
     def _n_points(self, weights):
         """
@@ -300,7 +307,7 @@ class WaveletTransformer:
                         2.0 * np.pi / omega):
             return 0.0, 0.0
 
-        weights = self._weight_alpha(self._time, omega, tau, self.c)
+        weights = self._weight_alpha(self._time, omega, tau)#, self.c)
         num_pts = self._n_points(weights)
 
         func_vals = np.array(
