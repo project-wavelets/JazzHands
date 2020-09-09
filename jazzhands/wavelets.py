@@ -30,14 +30,41 @@ class WaveletTransformer:
     c : float
         Decay rate of Gaussian envelope of wavelet. Default 0.0125
     """
-    def __init__(self, func_list, f1, data, time, omegas, taus, c=0.0125):
-
+    def __init__(self, time, data, func_list=None, f1=None, omegas=None, nus=None, scales=None, taus=None, c=0.0125):
+        
+        self._time = np.asarray(time)
+        self._data = np.asarray(data)
+        
+        if self._time.shape != self._data.shape:
+            raise ValueError('time and data should have the same shape')
+        
         self.func_list = func_list
         self.f1 = f1
-        self._data = np.asarray(data)
-        self._time = np.asarray(time)
-        self._omegas = np.asarray(omegas)
+        
+        if (((omegas is not None) & (nus is not None)) | 
+            ((omegas is not None) & (scales is not None)) | 
+            ((scales is not None) & (nus is not None))):
+            raise ValueError('Please only supply either omegas, nus, or scales'
+                             'and not a combination')
+        elif omegas is not None:
+            self._omegas = np.asarray(omegas)
+            self._nus = np.asarray(omegas) / 2.0 / np.pi
+            self._scales = 2.0 * np.pi / np.asarray(omegas)
+        elif nus is not None:
+            self._nus = np.asarray(nus)
+            self._omegas = 2.0 * np.pi * np.asarray(nus)
+            self._scales = 1.0 / np.asarray(scales)
+        elif scales is not None:
+            self._scales = np.asarray(scales)
+            self._omegas = 2.0 * np.pi / np.asarray(scales)
+            self._nuss = 1.0 / np.asarray(scales)
+        else:
+            self._omegas = np.asarray(omegas)
+            self._nus = np.asarray(nus)
+            self._scales = np.asarray(scales)
+            
         self._taus = np.asarray(taus)
+        
         self.c = c
 
     @property
@@ -68,17 +95,55 @@ class WaveletTransformer:
 
     @property
     def omegas(self):
+        if self._omegas is None:
+            print('Omegas not yet set')
         return self._omegas
 
     @omegas.setter
     def omegas(self, new_omegas):
         new_omegas = np.asarray(new_omegas)
-        if not new_omegas.shape == self._omegas.shape:
+        if (not new_omegas.shape == self._omegas.shape) & (self._omegas is not None):
             raise ValueError('Can only assign new data of the same shape as '
                              'the original array')
 
         self._omegas = new_omegas
+        self._nus = new_omegas / 2.0 / np.pi
+        self._scales = 2.0 * np.pi / new_omegas
+        
+    @property
+    def nus(self):
+        if self._nus is None:
+            print('Nus not yet set')
+        return self._nus
 
+    @nus.setter
+    def nus(self, new_nus):
+        new_nus = np.asarray(new_nus)
+        if (not new_nus.shape == self._nus.shape) & (self._nus is not None):
+            raise ValueError('Can only assign new data of the same shape as '
+                             'the original array')
+
+        self._nus = new_nus
+        self._omegas = 2.0 * np.pi * new_nus
+        self._scales = 1.0 / new_nus
+
+    @property
+    def scales(self):
+        if self._scales is None:
+            print('Scales not yet set')
+        return self._scales
+
+    @scales.setter
+    def scales(self, new_scales):
+        new_scales = np.asarray(new_scales)
+        if (not new_scales.shape == self._scales.shape) & (self._scales is not None):
+            raise ValueError('Can only assign new data of the same shape as '
+                             'the original array')
+
+        self._scales = new_scales
+        self._nus = 1.0 / new_scales
+        self._omegass = 2.0 * np.pi / new_scales
+        
     @property
     def taus(self):
         return self._taus
@@ -316,7 +381,7 @@ class WaveletTransformer:
         return ((num_pts - 3.0) * y_var) / (2.0 * (x_var - y_var)), np.sqrt(
             np.power(y_coeff_rows[1], 2.0) + np.power(y_coeff_rows[2], 2.0))
 
-    def compute_wavelet(self, exclude=True, parallel=False, n_processes=False):
+    def compute_wavelet(self, omegas=None, nus=None, scales=None, taus=None, exclude=True, parallel=False, n_processes=False):
         """
         Calculate the Weighted Wavelet Transform of the object.
         Note that this can be incredibly slow for a large enough light curve and a dense enough grid of omegas and taus, so we include multiprocessing to speed it up.
@@ -335,6 +400,29 @@ class WaveletTransformer:
         WWA : float
             Corresponding amplitude of the signal at the given frequency/time
         """
+        if taus is not None:
+            self.taus(taus)
+        elif self._taus is None:
+            raise ValueError('Please set taus')
+            
+        
+        if (((omegas is not None) & (nus is not None)) | 
+            ((omegas is not None) & (scales is not None)) | 
+            ((scales is not None) & (nus is not None))):
+            raise ValueError('Please only supply either omegas, nus, or scales'
+                             'and not a combination')
+        elif omegas is not None:
+            self.omegas(omegas)
+        elif nus is not None:
+            self.nus(nus)
+        elif scales is not None:
+            self.scales(scales)
+        elif ((self._omegas is None) & 
+              (self._nus is None) & 
+              (self._scales is None) &):
+            raise ValueError('Please set either omegas, nus, or scales')
+        
+        
         from tqdm.autonotebook import tqdm
 
         if parallel:
