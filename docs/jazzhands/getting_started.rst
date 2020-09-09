@@ -34,6 +34,12 @@ randomly sampled over 10 periods, with some Gaussian noise added in:
     >>> f_obs = np.sin(2*np.pi*1.0*t_obs) #Sin wave with frequency of 1
     
     >>> f_obs += 0.1*np.random.randn(len(f_obs)) #Add in some Gaussian noise
+    
+Let's plot to see how it looks:
+
+.. code-block:: python
+
+    >>> from matplotlib import pyplot as plt
 
     >>> plt.scatter(t_obs, f_obs)
     
