@@ -27,7 +27,9 @@ randomly sampled over 10 periods, with some Gaussian noise added in:
         
     >>> import numpy as np
     
-    >>> t_obs = np.random.uniform(0,10,1000).sort() #Generate synthetic data
+    >>> t_obs = np.random.uniform(low=0.0,high=10,size=1000) #Generate synthetic data
+    
+    >>> t_obs.sort() 
     
     >>> f_obs = np.sin(2*np.pi*1.0*t_obs) #Sin wave with frequency of 1
     
