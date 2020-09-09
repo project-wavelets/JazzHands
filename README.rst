@@ -17,8 +17,8 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
   :target: https://codecov.io/gh/avivajpeyi/JazzHands
   
 .. image:: https://readthedocs.org/projects/jazzhands/badge/?version=latest
-:target: https://jazzhands.readthedocs.io/en/latest/?badge=latest
-:alt: Documentation Status
+  :target: https://jazzhands.readthedocs.io/en/latest/?badge=latest
+
 
 
 
