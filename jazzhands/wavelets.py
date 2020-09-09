@@ -572,7 +572,7 @@ class WaveletTransformer:
         n_tau = int(resolution_factor * (tau_max - tau_min) / dt_max) + 1
         taus = np.linspace(tau_min, tau_max, n_tau)
 
-        returns omegas, taus
+        return omegas, taus
 
     def auto_compute(self, nu_min, nu_max, tau_min=None, tau_max=None, resolution_factor=3, exclude=True, parallel=False, n_processes=False):
         """
