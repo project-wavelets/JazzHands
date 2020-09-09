@@ -26,6 +26,15 @@ class WaveletsTest(unittest.TestCase):
                                 time="[0, 0]", omegas=[0, 0], taus=[0, 0], c=[123123])
 
 
+class FreqGridTest(unittest.TestCase):
+
+    def test_omegas_taus_from_min_max_nug(self):
+        res = wavelets._omegas_taus_from_min_max_nu(
+            1, 1, 1, 1, 1, 1
+        )
+        self.assertIsNotNone(res)
+        self.assertIsInstance(res[0], np.ndarray)
+
 
 if __name__ == '__main__':
     unittest.main()
