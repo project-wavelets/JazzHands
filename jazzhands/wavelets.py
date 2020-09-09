@@ -533,12 +533,12 @@ class WaveletTransformer:
     
     def auto_compute(self, nu_min, nu_max, tau_min=None, tau_max=None, resolution_factor=3, exclude=True, parallel=False, n_processes=False):
         """
-        Calculate the Weighted Wavelet Transform of the object. Note that this 
-        can be incredibly slow for a large enough light curve and a dense 
-        enough grid of omegas and taus, so we include multiprocessing to speed 
-        it up. You can update the omega/nu/scale and tau grids if you 
-        initialized the `WaveletTransformer` object with them, or set them now
-        if you didn't.
+        Calculate the Weighted Wavelet Transform of the object in a user-
+        specified frequency window. `auto_compute` then figures out the 
+        frequency and time spacing in order to ensure `resolution_factor`
+        grid points per resolution element, and sets the `.omegas`, `.nus`, 
+        `.scales`, and `.taus` attributes of the `WaveletTransformer`, and runs
+        the wavelet transformation.
         
         Parameters
         ----------
