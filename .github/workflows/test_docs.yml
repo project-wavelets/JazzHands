@@ -17,14 +17,3 @@ jobs:
             pip install -r testing_requirements.txt
             python setup.py install
             pytest docs/
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./coverage.xml
-          files: ./coverage1.xml,./coverage2.xml
-          directory: ./coverage/reports/
-          flags: unittests
-          env_vars: OS,PYTHON
-          name: codecov-umbrella
-          fail_ci_if_error: false
-          path_to_write_report: ./coverage/codecov_report.gz
