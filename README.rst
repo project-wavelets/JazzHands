@@ -5,6 +5,18 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
+.. image:: https://github.com/avivajpeyi/JazzHands/workflows/doctest%20%F0%9F%A7%AA/badge.svg
+    :target: https://github.com/avivajpeyi/JazzHands/actions
+    :alt: doctest 🧪
+
+.. image:: https://github.com/avivajpeyi/JazzHands/workflows/testing%20%F0%9F%A7%AA/badge.svg
+    :target: https://github.com/avivajpeyi/JazzHands/actions
+    :alt: testing 🧪
+
+.. image:: https://codecov.io/gh/avivajpeyi/JazzHands/branch/testing/graph/badge.svg
+  :target: https://codecov.io/gh/avivajpeyi/JazzHands
+
+
 
 Authors
 -------
