@@ -17,14 +17,16 @@ jobs:
           pip install -r testing_requirements.txt
           python setup.py install
           pytest --cov=./jazzhands --cov-report=xml ./jazzhands/tests/
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+      - name: Codecov
+        uses: codecov/codecov-action@v1.0.13
         with:
+          # User defined upload name. Visible in Codecov UI
+          name: github-action
+          # Repository upload token - get it from codecov.io. Required only for private repositories
+          token: 000cc777-8f46-4406-8465-837cb8ff31b8
+          # Path to coverage file to upload
           file: ./coverage.xml
-          files: ./coverage1.xml,./coverage2.xml
-          directory: ./coverage/reports/
-          flags: unittests
-          env_vars: OS,PYTHON
-          name: codecov-umbrella
-          fail_ci_if_error: false
-          path_to_write_report: ./coverage/codecov_report.gz
+          # Environment variables to tag the upload with (e.g. PYTHON | OS,PYTHON)
+          env_vars: PYTHON
+          # Specify whether or not CI build should fail if Codecov runs into an error during upload
+          fail_ci_if_error: True
