@@ -13,6 +13,8 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
     :target: https://github.com/avivajpeyi/JazzHands/actions
     :alt: testing 🧪
 
+.. image:: https://codecov.io/gh/avivajpeyi/JazzHands/branch/main/graph/badge.svg
+  :target: https://codecov.io/gh/avivajpeyi/JazzHands
 
 
 
