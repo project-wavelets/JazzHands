@@ -102,9 +102,6 @@ class WaveletTransformer:
     @omegas.setter
     def omegas(self, new_omegas):
         new_omegas = np.asarray(new_omegas)
-        if (not new_omegas.shape == self._omegas.shape) & (self._omegas is not None):
-            raise ValueError('Can only assign new data of the same shape as '
-                             'the original array')
 
         self._omegas = new_omegas
         self._nus = new_omegas / 2.0 / np.pi
@@ -119,9 +116,6 @@ class WaveletTransformer:
     @nus.setter
     def nus(self, new_nus):
         new_nus = np.asarray(new_nus)
-        if (not new_nus.shape == self._nus.shape) & (self._nus is not None):
-            raise ValueError('Can only assign new data of the same shape as '
-                             'the original array')
 
         self._nus = new_nus
         self._omegas = 2.0 * np.pi * new_nus
@@ -136,9 +130,6 @@ class WaveletTransformer:
     @scales.setter
     def scales(self, new_scales):
         new_scales = np.asarray(new_scales)
-        if (not new_scales.shape == self._scales.shape) & (self._scales is not None):
-            raise ValueError('Can only assign new data of the same shape as '
-                             'the original array')
 
         self._scales = new_scales
         self._nus = 1.0 / new_scales
@@ -151,9 +142,6 @@ class WaveletTransformer:
     @taus.setter
     def taus(self, new_taus):
         new_taus = np.asarray(new_taus)
-        if not new_taus.shape == self._taus.shape:
-            raise ValueError('Can only assign new data of the same shape as '
-                             'the original array')
 
         self._taus = new_taus
 
