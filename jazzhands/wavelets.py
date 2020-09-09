@@ -562,8 +562,8 @@ class WaveletTransformer:
             If `mp` is True, sets the `processes` parameter of `multiprocessing.Pool`. If not given, sets to `multiprocessing.cpu_count()-1`
         Returns
         -------
-        omegas : `numpy.ndarray`
-            Angular frequencies
+        nus : `numpy.ndarray`
+            Frequencies
         taus : `numpy.ndarray`
             Time shifts
         WWZ : `numpy.ndarray`
@@ -582,7 +582,7 @@ class WaveletTransformer:
         
         wwz, wwa = self.compute_wavelet()
         
-        return omegas, taus, wwz, wwa
+        return self._nus, self._taus, wwz, wwa
     
     def resolution(self, nu):
         """

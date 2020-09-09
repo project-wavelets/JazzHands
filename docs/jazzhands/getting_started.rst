@@ -59,13 +59,13 @@ for now, we'll assume you just want a quick wavlet transform:
 
 .. code-block:: python
 
-    >>> omegas, taus, wwz, wwa = wt.auto_compute(nu_min=0.5, nu_max=1.5)
+    >>> nus, taus, wwz, wwa = wt.auto_compute(nu_min=0.5, nu_max=1.5)
     
     
 Because real data may have signals at a variety of frequencies, we needed to 
 specify the window in frequency we want to focus on to improve computational 
 efficiency. `nu_min` is the minimum frequency, and `nu_max` is the max. The 
-resulting quantities are the angular frequencies and wavelet locations 
+resulting quantities are the frequencies and centers of the wavelets that were 
 automatically determined when we called `auto_compute`, the Weighted Wavelet
 Z-transform (equivalent to the wavelet power), and the Weighted Wavelet 
 Amplitude. The `WaveletTransformer` is now populated with some handy attributes
