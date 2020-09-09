@@ -13,3 +13,19 @@ python:
         - all
 
 formats: []
+
+name: JazzHands
+
+channels:
+    - astropy
+
+dependencies:
+    - astropy
+    - scipy
+    - matplotlib
+    - numpy
+    - specutils
+    - astroquery
+    - pip:
+        - sphinx-automodapi
+        - numpydoc
