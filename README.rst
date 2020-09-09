@@ -15,6 +15,10 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
 
 .. image:: https://codecov.io/gh/avivajpeyi/JazzHands/branch/testing/graph/badge.svg
   :target: https://codecov.io/gh/avivajpeyi/JazzHands
+  
+.. image:: https://readthedocs.org/projects/jazzhands/badge/?version=latest
+  :target: https://jazzhands.readthedocs.io/en/latest/?badge=latest
+
 
 
 
