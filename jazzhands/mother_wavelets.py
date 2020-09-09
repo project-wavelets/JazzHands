@@ -37,6 +37,25 @@ class Morlet:
             return self.construct_wavelet_freq(t, tau, s, use_scale)
 
     def weights(self, t, s=1.0, tau=1.0, use_scale=False):
+        """
+        Weighting function for each point at a given omega and tau; (5-3) in Foster (1996).
+        Parameters
+        ----------
+        time : array-like
+            times of observations
+        s : float
+            angular frequency in radians per unit time or scale depending on 
+            use_scale keyword
+        tau : float
+            time shift in same units as t
+        use_scale : boolean
+            If True then s is equal to the wavelet scale, if False then s is
+            given as the angular frequency (or dilation)
+        Returns
+        -------
+        array-like
+            Statistical weights of data points
+        """
         # If use_scale is set then s is taken to be the scale rather than dilation
         if use_scale:
             eta = 2*np.pi*(t - tau)/s

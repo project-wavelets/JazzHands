@@ -99,26 +99,6 @@ class WaveletTransformer:
 
         self._taus = new_taus
 
-    #def _weight_alpha(self, time, omega, tau, c):
-    #    """
-    #    Weighting function for each point at a given omega and tau; (5-3) in Foster (1996).
-    #    Parameters
-    #    ----------
-    #    time : array-like
-    #        times of observations
-    #    omega : float
-    #        angular frequency in radians per unit time.
-    #    tau : float
-    #        time shift in same units as t
-    #    c : float
-    #        Decay constant of the Gaussian envelope for the wavelet
-    #    Returns
-    #    -------
-    #    array-like
-    #        Statistical weights of data points
-    #    """
-    #    return np.exp(-c * np.power(omega * (time - tau), 2.0))
-
     def _n_points(self, weights):
         """
         Effective number of points contributing to the transform; (5-4) in Foster (1996).
