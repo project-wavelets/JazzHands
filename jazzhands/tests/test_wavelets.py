@@ -17,7 +17,7 @@ class WaveletsTest(unittest.TestCase):
 
     def test_correct_constructor(self):
         wavelets.WaveletTransformer(func_list=[0, 0], f1=[0, 0], data=[0, 0],
-                                    time=[0, 0], omegas=[0, 0], taus=[0, 0], c=0.0125)
+                                    time=[0, 0], omegas=[1, 1], taus=[0, 0], c=0.0125)
 
     # def test_omegas_taus_from_min_max_nu(self):
     #     wav = wavelets.WaveletTransformer(func_list=[0, 0], f1=[0, 0], data=[0, 0], time=[0, 0], omegas=[0, 0], taus=[0, 0], c=0.0125)
