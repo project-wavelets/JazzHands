@@ -101,13 +101,17 @@ can specify either when initializing the `WaveletTransformer`
     
     >>> wt = WaveletTransformer(t_obs, f_obs, scales=scales, taus=taus)
     
-or when running the more customizable `compute_wavelet`:
+or later, by explicitly setting variables before running `compute_wavelet`:
 
 .. code-block:: python
 
     >>> wt = WaveletTransformer(t_obs, f_obs)
     
-    >>> wwz, wwa = wt.compute_wavelet(scales=scales, taus=taus)
+    >>> wt.taus = taus
+    
+    >>> wt.scales = scales
+    
+    >>> wwz, wwa = wt.compute_wavelet()
     
 You can also change the decay constant of the wavelet envelope using the `c` 
 parameter when initializing the `WaveletTransformer`; `c` is set to 0.0125 
