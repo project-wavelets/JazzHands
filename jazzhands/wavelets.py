@@ -487,7 +487,7 @@ class WaveletTransformer:
         enough grid of omegas and taus, so we include multiprocessing to speed
         it up. You can update the omega/nu/scale and tau grids if you
         initialized the `WaveletTransformer` object with them, or set them now
-        if you didn"t.
+        if you didn't.
 
         Parameters
         ----------
