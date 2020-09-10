@@ -4,9 +4,10 @@ Definition of :class::class:`Wavelet`.
 Based on Foster 1996
 """
 import numpy as np
+
 from jazzhands.utils import phi_1, phi_2, phi_3
 
-__all__ = ['WaveletTransformer']
+__all__ = ["WaveletTransformer"]
 
 
 class WaveletTransformer:
@@ -20,8 +21,8 @@ class WaveletTransformer:
     time : array-like
         Times of observations
 
-    data : array-like
-        Observed data
+    counts : array-like
+        Observed counts
 
     func_list : array-like, optional
         Array or list containing the basis functions, not yet evaluated. If you
@@ -47,12 +48,26 @@ class WaveletTransformer:
         Decay rate of Gaussian envelope of wavelet. Default 0.0125
 
     """
-    def __init__(self, time, data, func_list=None, f1=None, omegas=None, nus=None, scales=None, taus=None, c=0.0125):
-        self._time = np.asarray(time)
-        self._data = np.asarray(data)
+    def __init__(self, time, counts, func_list=None, f1=None, omegas=None, nus=None, scales=None, taus=None, c=0.0125):
 
-        if self._time.shape != self._data.shape:
-            raise ValueError('time and data should have the same shape')
+        # REVIEW: Force type checking. If needed then add to all public functions.
+        for key, value in locals().items():
+            if key in ['time', 'counts']:
+                if not isinstance(value, (list, tuple, np.ndarray)):
+                    raise TypeError((f"{key} should be of type list, tuple or np.ndarray but is of type {type(value)}"))
+            elif key in ['omegas', 'nus', 'scales', 'taus']:
+                if not isinstance(value, (list, tuple, np.ndarray)):
+                    if value is not None:
+                        raise TypeError((f"{key} should be of type list, tuple, np.ndarray or NoneType but is of type {type(value)}"))
+            elif key == 'c':
+                if not isinstance(value, (int, float, complex)):
+                    raise TypeError((f"{key} should be of type int, float, complex but is of type {type(value)}"))
+
+        self._time = np.asarray(time)
+        self._counts = np.asarray(counts)
+
+        if self._time.shape != self._counts.shape:
+            raise ValueError("time and counts must have the same shape")
 
         if func_list is None:
             self.func_list = [phi_1, phi_2, phi_3]
@@ -64,20 +79,38 @@ class WaveletTransformer:
         if (omegas is not None and nus is not None) or \
            (omegas is not None and scales is not None) or \
            (scales is not None and nus is not None):
-            raise ValueError('Please only supply either omegas, nus, or scales'
-                             'and not a combination')
+            raise ValueError("Please only supply either omegas, nus, or scales"
+                             "and not a combination")
+
         elif omegas is not None:
             self._omegas = np.asarray(omegas)
-            self._nus = np.asarray(omegas) / 2.0 / np.pi
-            self._scales = 2.0 * np.pi / np.asarray(omegas)
+            self._nus = self._omegas / 2.0 / np.pi
+
+            if 0 in self._omegas:
+                raise ZeroDivisionError("omegas cannot have zero")
+            else:
+                self._scales = 2.0 * np.pi / self._omegas
+
         elif nus is not None:
             self._nus = np.asarray(nus)
-            self._omegas = 2.0 * np.pi * np.asarray(nus)
-            self._scales = 1.0 / np.asarray(scales)
+            self._omegas = 2.0 * np.pi * self._nus
+
+            if 0 in self._nus:
+                raise ZeroDivisionError("nus cannot have zero")
+            else:
+                # REVIEW: Changed from self._scales = 1.0 / np.asarray(scales)
+                # as it seemed wrong
+                self._scales = 1.0 / self._nus
+
         elif scales is not None:
             self._scales = np.asarray(scales)
-            self._omegas = 2.0 * np.pi / np.asarray(scales)
-            self._nus = 1.0 / np.asarray(scales)
+            self._omegas = 2.0 * np.pi / self._scales
+
+            if 0 in self._scales:
+                raise ZeroDivisionError("scales cannot have zero")
+            else:
+                self._nus = 1.0 / self._scales
+
         elif omegas is None and scales is None and nus is None:
             self._omegas = None
             self._nus = None
@@ -94,80 +127,76 @@ class WaveletTransformer:
     def time(self, new_time):
         new_time = np.asarray(new_time)
         if not new_time.shape == self._time.shape:
-            raise ValueError('Can only assign new time of the same shape as '
-                             'the original array')
+            raise ValueError("Can only assign new time of the same shape as "
+                             "the original array")
 
         self._time = new_time
 
     @property
-    def data(self):
-        return self._data
+    def counts(self):
+        return self._counts
 
-    @data.setter
-    def data(self, new_data):
-        new_data = np.asarray(new_data)
-        if not new_data.shape == self._data.shape:
-            raise ValueError('Can only assign new data of the same shape as '
-                             'the original array')
+    @counts.setter
+    def counts(self, new_counts):
+        new_counts = np.asarray(new_counts)
+        if not new_counts.shape == self._counts.shape:
+            raise ValueError("Can only assign new counts of the same shape as "
+                             "the original array")
 
-        self._data = new_data
+        self._counts = new_counts
 
     @property
     def omegas(self):
         if self._omegas is None:
-            print('Omegas not yet set')
+            print(f"Omegas not set, type: {type(self._omegas)}")
         else:
             return self._omegas
 
     @omegas.setter
     def omegas(self, new_omegas):
-        new_omegas = np.asarray(new_omegas)
+        self._omegas = np.asarray(new_omegas)
 
-        self._omegas = new_omegas
-        self._nus = new_omegas / 2.0 / np.pi
-        self._scales = 2.0 * np.pi / new_omegas
+        self._nus = self._omegas / 2.0 / np.pi
+        self._scales = 2.0 * np.pi / self._omegas
 
     @property
     def nus(self):
         if self._nus is None:
-            print('Nus not yet set')
+            print(f"Nus not set, type: {type(self._nus)}")
         else:
             return self._nus
 
     @nus.setter
     def nus(self, new_nus):
-        new_nus = np.asarray(new_nus)
+        self._nus = np.asarray(new_nus)
 
-        self._nus = new_nus
-        self._omegas = 2.0 * np.pi * new_nus
-        self._scales = 1.0 / new_nus
+        self._omegas = 2.0 * np.pi * self._nus
+        self._scales = 1.0 / self._nus
 
     @property
     def scales(self):
         if self._scales is None:
-            print('Scales not yet set')
+            print(f"Scales not set, type: {type(self._scales)}")
         else:
             return self._scales
 
     @scales.setter
     def scales(self, new_scales):
-        new_scales = np.asarray(new_scales)
+        self._scales = np.asarray(new_scales)
 
-        self._scales = new_scales
-        self._nus = 1.0 / new_scales
-        self._omegas = 2.0 * np.pi / new_scales
+        self._nus = 1.0 / self._scales
+        self._omegas = 2.0 * np.pi / self._scales
 
     @property
     def taus(self):
         if self._taus is None:
-            print('Taus is not yet set')
+            print(f"Taus not set, type: {type(self._taus)}")
         else:
             return self._taus
 
     @taus.setter
     def taus(self, new_taus):
-        new_taus = np.asarray(new_taus)
-        self._taus = new_taus
+        self._taus = np.asarray(new_taus)
 
     @property
     def c(self):
@@ -175,8 +204,7 @@ class WaveletTransformer:
 
     @c.setter
     def c(self, new_c):
-        new_c = float(new_c)
-        self._c = new_c
+        self._c = float(new_c)
 
     def _weight_alpha(self, time, omega, tau, c):
         """
@@ -244,7 +272,7 @@ class WaveletTransformer:
         """
         return np.sum(weights * func1 * func2) / np.sum(weights)
 
-    def _inner_product_vector(self, func_vals, weights, data):
+    def _inner_product_vector(self, func_vals, weights, counts):
         """
         Generates a column vector consisting of the inner products between the basis functions and the observed data
 
@@ -257,17 +285,17 @@ class WaveletTransformer:
         weights : array-like
             weights of observations, already calculated
 
-        data : array-like
+        counts : array-like
             Observed data
 
         Returns
         -------
         `numpy.array`
-            Column vector where phi_y_i = phi_i * data
+            Column vector where phi_y_i = phi_i * counts
 
         """
         return np.array([[
-            self._inner_product(func, data, weights) for func in func_vals
+            self._inner_product(func, counts, weights) for func in func_vals
         ]]).T
 
     def _S_matrix(self, func_vals, weights):
@@ -296,7 +324,7 @@ class WaveletTransformer:
 
         return np.matrix(S)
 
-    def _calc_coeffs(self, func_vals, weights, data):
+    def _calc_coeffs(self, func_vals, weights, counts):
         """
         Calculate the coefficients of each $\phi$. Adapted from (4-4) in Foster (1996).
 
@@ -309,7 +337,7 @@ class WaveletTransformer:
         weights : array-like
             Weights of observations, already calculated
 
-        data : array-like
+        counts : array-like
             Observed data
 
         Returns
@@ -319,11 +347,11 @@ class WaveletTransformer:
 
         """
         S_m = self._S_matrix(func_vals, weights)
-        phi_y = self._inner_product_vector(func_vals, weights, data)
+        phi_y = self._inner_product_vector(func_vals, weights, counts)
 
         return np.linalg.solve(S_m, phi_y).T
 
-    def _weight_var_x(self, f1_vals, weights, data):
+    def _weight_var_x(self, f1_vals, weights, counts):
         """
         Calculate the weighted variation of the data. Adapted from (5-9) in Foster (1996).
 
@@ -331,24 +359,24 @@ class WaveletTransformer:
         ----------
         f1_vals : array-like
             Array of values of the first basis function; should be equivalent
-            to `numpy.ones(len(data))`
+            to `numpy.ones(len(counts))`
 
         weights : array-like
             Weights of observations, already calculated
 
-        data : array-like
+        counts : array-like
             Observed data
 
         Returns
         -------
         float
-            Weighted variation of the data
+            Weighted variation of the counts
 
         """
-        return self._inner_product(data, data, weights) - np.power(
-            self._inner_product(f1_vals, data, weights), 2.0)
+        return self._inner_product(counts, counts, weights) - np.power(
+            self._inner_product(f1_vals, counts, weights), 2.0)
 
-    def _y_fit(self, func_vals, weights, data):
+    def _y_fit(self, func_vals, weights, counts):
         """
         Calculate the value of the model.
 
@@ -361,7 +389,7 @@ class WaveletTransformer:
         weights : array-like
             Weights of observations, already calculated
 
-        data : array-like
+        counts : array-like
             Observed data
 
         Returns
@@ -372,11 +400,11 @@ class WaveletTransformer:
         y_coeffs : `numpy.array`
             The coefficients returned by `coeffs`
         """
-        y_coeffs = self._calc_coeffs(func_vals, weights, data)
+        y_coeffs = self._calc_coeffs(func_vals, weights, counts)
 
         return y_coeffs.dot(func_vals), y_coeffs
 
-    def _weight_var_y(self, func_vals, f1_vals, weights, data):
+    def _weight_var_y(self, func_vals, f1_vals, weights, counts):
         """
         Calculate the weighted variation of the model. Adapted from (5-10) in Foster (1996).
 
@@ -386,12 +414,12 @@ class WaveletTransformer:
             Array of values of basis functions at times corresponding to the weights. Should have shape (number of basis functions, len(weights))
 
         f1_vals : array-like
-            Array of values of the first basis function; should be equivalent to `numpy.ones(len(data))`
+            Array of values of the first basis function; should be equivalent to `numpy.ones(len(counts))`
 
         weights : array-like
             Weights of observations, already calculated
 
-        data : array-like
+        counts : array-like
             Observed data
 
         Returns
@@ -403,7 +431,7 @@ class WaveletTransformer:
             Coefficients from `coeffs`
 
         """
-        y_f, y_coeffs = self._y_fit(func_vals, weights, data)
+        y_f, y_coeffs = self._y_fit(func_vals, weights, counts)
 
         return self._inner_product(y_f, y_f, weights) - np.power(
             self._inner_product(f1_vals, y_f, weights), 2.0), y_coeffs
@@ -444,9 +472,9 @@ class WaveletTransformer:
 
         f1_vals = self.f1(self._time, omega, tau)
 
-        x_var = self._weight_var_x(f1_vals, weights, self._data)
+        x_var = self._weight_var_x(f1_vals, weights, self._counts)
         y_var, y_coeff = self._weight_var_y(func_vals, f1_vals, weights,
-                                            self._data)
+                                            self._counts)
         y_coeff_rows = y_coeff[0]
 
         return ((num_pts - 3.0) * y_var) / (2.0 * (x_var - y_var)), np.sqrt(
@@ -482,16 +510,17 @@ class WaveletTransformer:
 
         """
         if self._taus is None:
-            raise ValueError('Please set taus')
+            raise ValueError(f"taus not set. {type(self._taus)}")
         if self._omegas is None and self._nus is None and self._scales is None:
-            raise ValueError("Please set omegas or nus or scales")
+            raise ValueError(
+                f"omegas and nus and scales not set. {type(self._omegas)}")
 
         from tqdm.autonotebook import tqdm
 
         if parallel:
             import multiprocessing as mp
 
-            n_processes = multiprocessing.cpu_count() - 1 if n_processes is None else n_processes
+            n_processes = mp.cpu_count() - 1 if n_processes is None else n_processes
 
             args = np.array([[exclude, tau, omega] for omega in self._omegas
                              for tau in tqdm(self._taus)])
@@ -632,7 +661,7 @@ class WaveletTransformer:
         if tau_max is None:
             tau_max = self._time.max()
 
-        self._omegas, self.taus = self._omegas_taus_from_min_max_nu(nu_min, nu_max, tau_min, tau_max, resolution_factor=resolution_factor)
+        self._omegas, self._taus = self._omegas_taus_from_min_max_nu(nu_min, nu_max, tau_min, tau_max, resolution_factor)
 
         wwz, wwa = self.compute_wavelet(exclude=exclude,
                                         parallel=parallel,
