@@ -43,9 +43,9 @@ Let's plot to see how it looks:
 
     >>> plt.scatter(t_obs, f_obs)
     
-    >>> plt.xlim('Time')
+    >>> plt.xlabel('Time')
     
-    >>> plt.ylim('Flux')
+    >>> plt.ylabel('Flux')
     
 Now let's initialize a `WaveletTransformer` object with our data:
 
@@ -76,6 +76,10 @@ for visualization:
     >>> import matplotlib.pyplot as plt
     
     >>> plt.contourf(wt.taus, wt.nus, wwz, levels=1000, vmin=0, vmax=1000)
+    
+    >>> plt.xlabel('Time')
+    
+    >>> plt.xlabel('Frequency')
 
 
 .. _getting_started-customization:

@@ -632,7 +632,7 @@ class WaveletTransformer:
         if tau_max is None:
             tau_max = self._time.max()
 
-        self._omegas, self.taus = self._omegas_taus_from_min_max_nu(nu_min, nu_max, tau_min, tau_max, resolution_factor=resolution_factor)
+        self.omegas, self.taus = self._omegas_taus_from_min_max_nu(nu_min, nu_max, tau_min, tau_max, resolution_factor=resolution_factor)
 
         wwz, wwa = self.compute_wavelet(exclude=exclude,
                                         parallel=parallel,
