@@ -36,7 +36,7 @@ randomly sampled over 10 periods, with some Gaussian noise added in:
     >>> f_obs += 0.1*np.random.randn(len(f_obs)) #Add in some Gaussian noise
     
 Let's plot to see how it looks:
-.. doctest-skip::   
+ 
 .. code-block:: python
 
     >>> from matplotlib import pyplot as plt
@@ -73,7 +73,7 @@ automatically determined when we called `auto_compute`, the Weighted Wavelet
 Z-transform (equivalent to the wavelet power), and the Weighted Wavelet 
 Amplitude. The `WaveletTransformer` is now populated with some handy attributes
 for visualization:
-.. doctest-skip::   
+  
 .. code-block:: python
 
     >>> import matplotlib.pyplot as plt
@@ -126,7 +126,7 @@ and frequency resolution as a function of frequency. The
 `WaveletTransformer.resolution` method lets us check these if we supply a 
 frequency:
 
-.. doctest-skip::   
+  
 .. code-block:: python
 
     >>> wt = WaveletTransformer(t_obs, f_obs, c=0.0125)
