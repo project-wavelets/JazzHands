@@ -30,7 +30,7 @@ This project is made by Trevor Dorn-Wallenstein, YOUR NAME HERE
 Documentation
 -------------
 
-Basic usage examples and the API are online at `ReadTheDocs! <https://jazzhands.readthedocs.io/en/latest/index.html>`_.
+Basic usage examples and the API are online at `ReadTheDocs! <https://jazzhands.readthedocs.io/en/latest/index.html>`_
 
 License
 -------

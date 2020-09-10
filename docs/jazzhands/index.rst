@@ -17,7 +17,7 @@ costs. You can view the `source code and submit issues via GitHub
 <https://github.com/tzdwi/JazzHands>`_.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Contents:
 
    install
