@@ -1,31 +1,23 @@
-import os
-import shutil
-import unittest
+import numpy as np
+import pytest
 
 from jazzhands import wavelets
 
 
-class WaveletsTest(unittest.TestCase):
-
-    def setUp(self):
-        self.outdir = "test"
-        os.makedirs(self.outdir, exist_ok=True)
-
-    def tearDown(self):
-        if os.path.exists(self.outdir):
-            shutil.rmtree(self.outdir)
-
+class TestWavelets(object):
     def test_correct_constructor(self):
-        wavelets.WaveletTransformer(func_list=[0, 0], f1=[0, 0], data=[0, 0],
-                                    time=[0, 0], omegas=[0, 0], taus=[0, 0], c=0.0125)
+        wavelets.WaveletTransformer(func_list=[0, 0], f1=[0, 0], counts=[0, 0],
+                                    time=[0, 0], omegas=[10, 10], taus=[0, 0], c=0.0125)
 
-    # def test_omegas_taus_from_min_max_nu(self):
-    #     wav = wavelets.WaveletTransformer(func_list=[0, 0], f1=[0, 0], data=[0, 0], time=[0, 0], omegas=[0, 0], taus=[0, 0], c=0.0125)
+    def test_incorrect_constructor(self):
+        with pytest.raises(TypeError) as excinfo:
+            wavelets.WaveletTransformer(func_list=[0, 0], f1=[0, 0], counts=[0, 0], time=[0, 0], omegas="hello", taus="blah", c=0.0125)
+        assert str(excinfo.value)
 
-    #     res = wav.auto_compute(1, 1, 1, 1, 1, 1)
-    #     self.assertIsNotNone(res)
-    #     self.assertIsInstance(res[0], np.ndarray)
+    def test_omegas_taus_from_min_max_nu(self):
+        wav = wavelets.WaveletTransformer(func_list=[0, 0], f1=[0, 0], counts=[0, 0], time=[0, 0], omegas=[10, 10], taus=[0, 0], c=0.0125)
 
+        res = wav._omegas_taus_from_min_max_nu(1, 1, 1, 1)
 
-if __name__ == '__main__':
-    unittest.main()
+        assert res is not None
+        assert isinstance((res[0] and res[1]), np.ndarray)

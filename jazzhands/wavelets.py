@@ -4,9 +4,10 @@ Definition of :class::class:`Wavelet`.
 Based on Foster 1996
 """
 import numpy as np
+
 from jazzhands.utils import phi_1, phi_2, phi_3
 
-__all__ = ['WaveletTransformer']
+__all__ = ["WaveletTransformer"]
 
 
 class WaveletTransformer:
@@ -48,11 +49,25 @@ class WaveletTransformer:
 
     """
     def __init__(self, time, counts, func_list=None, f1=None, omegas=None, nus=None, scales=None, taus=None, c=0.0125):
+
+        # REVIEW: Force type checking. If needed then add to all public functions.
+        for key, value in locals().items():
+            if key in ['time', 'counts']:
+                if not isinstance(value, (list, tuple, np.ndarray)):
+                    raise TypeError((f"{key} should be of type list, tuple or np.ndarray but is of type {type(value)}"))
+            elif key in ['omegas', 'nus', 'scales', 'taus']:
+                if not isinstance(value, (list, tuple, np.ndarray)):
+                    if value is not None:
+                        raise TypeError((f"{key} should be of type list, tuple, np.ndarray or NoneType but is of type {type(value)}"))
+            elif key == 'c':
+                if not isinstance(value, (int, float, complex)):
+                    raise TypeError((f"{key} should be of type int, float, complex but is of type {type(value)}"))
+
         self._time = np.asarray(time)
         self._counts = np.asarray(counts)
 
         if self._time.shape != self._counts.shape:
-            raise ValueError('time and counts must have the same shape')
+            raise ValueError("time and counts must have the same shape")
 
         if func_list is None:
             self.func_list = [phi_1, phi_2, phi_3]
@@ -64,8 +79,8 @@ class WaveletTransformer:
         if (omegas is not None and nus is not None) or \
            (omegas is not None and scales is not None) or \
            (scales is not None and nus is not None):
-            raise ValueError('Please only supply either omegas, nus, or scales'
-                             'and not a combination')
+            raise ValueError("Please only supply either omegas, nus, or scales"
+                             "and not a combination")
 
         elif omegas is not None:
             self._omegas = np.asarray(omegas)
@@ -112,8 +127,8 @@ class WaveletTransformer:
     def time(self, new_time):
         new_time = np.asarray(new_time)
         if not new_time.shape == self._time.shape:
-            raise ValueError('Can only assign new time of the same shape as '
-                             'the original array')
+            raise ValueError("Can only assign new time of the same shape as "
+                             "the original array")
 
         self._time = new_time
 
@@ -125,15 +140,15 @@ class WaveletTransformer:
     def counts(self, new_counts):
         new_counts = np.asarray(new_counts)
         if not new_counts.shape == self._counts.shape:
-            raise ValueError('Can only assign new counts of the same shape as '
-                             'the original array')
+            raise ValueError("Can only assign new counts of the same shape as "
+                             "the original array")
 
         self._counts = new_counts
 
     @property
     def omegas(self):
         if self._omegas is None:
-            print(f'Omegas not set, type: {type(self._omegas)}')
+            print(f"Omegas not set, type: {type(self._omegas)}")
         else:
             return self._omegas
 
@@ -147,7 +162,7 @@ class WaveletTransformer:
     @property
     def nus(self):
         if self._nus is None:
-            print(f'Nus not set, type: {type(self._nus)}')
+            print(f"Nus not set, type: {type(self._nus)}")
         else:
             return self._nus
 
@@ -161,7 +176,7 @@ class WaveletTransformer:
     @property
     def scales(self):
         if self._scales is None:
-            print(f'Scales not set, type: {type(self._scales)}')
+            print(f"Scales not set, type: {type(self._scales)}")
         else:
             return self._scales
 
@@ -175,7 +190,7 @@ class WaveletTransformer:
     @property
     def taus(self):
         if self._taus is None:
-            print(f'Taus not set, type: {type(self._taus)}')
+            print(f"Taus not set, type: {type(self._taus)}")
         else:
             return self._taus
 
@@ -472,7 +487,7 @@ class WaveletTransformer:
         enough grid of omegas and taus, so we include multiprocessing to speed
         it up. You can update the omega/nu/scale and tau grids if you
         initialized the `WaveletTransformer` object with them, or set them now
-        if you didn't.
+        if you didn"t.
 
         Parameters
         ----------
@@ -495,7 +510,7 @@ class WaveletTransformer:
 
         """
         if self._taus is None:
-            raise ValueError(f'taus not set. {type(self._taus)}')
+            raise ValueError(f"taus not set. {type(self._taus)}")
         if self._omegas is None and self._nus is None and self._scales is None:
             raise ValueError(
                 f"omegas and nus and scales not set. {type(self._omegas)}")
@@ -646,7 +661,7 @@ class WaveletTransformer:
         if tau_max is None:
             tau_max = self._time.max()
 
-        self._omegas, self.taus = self._omegas_taus_from_min_max_nu(nu_min, nu_max, tau_min, tau_max, resolution_factor)
+        self._omegas, self._taus = self._omegas_taus_from_min_max_nu(nu_min, nu_max, tau_min, tau_max, resolution_factor)
 
         wwz, wwa = self.compute_wavelet(exclude=exclude,
                                         parallel=parallel,
