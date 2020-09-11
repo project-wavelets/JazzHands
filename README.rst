@@ -25,7 +25,7 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
 Authors
 -------
 
-This project is made by Trevor Dorn-Wallenstein, Amogh Desai(@theand9), Greg Gilbert (@gjgilbert), Athul R T (@athulvis)
+This project is made by Trevor Dorn-Wallenstein, Amogh Desai(@theand9), Greg Gilbert (@gjgilbert), Athul R T (@athulvis), YOUR NAME HERE
 
 Documentation
 -------------
