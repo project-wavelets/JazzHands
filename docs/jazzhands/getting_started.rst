@@ -36,16 +36,16 @@ randomly sampled over 10 periods, with some Gaussian noise added in:
     >>> f_obs += 0.1*np.random.randn(len(f_obs)) #Add in some Gaussian noise
     
 Let's plot to see how it looks:
- 
+
 .. code-block:: python
 
     >>> from matplotlib import pyplot as plt
 
-    >>> plt.scatter(t_obs, f_obs)
+    >>> plt.scatter(t_obs, f_obs) #doctest: +SKIP
   
-    >>> plt.xlabel('Time') 
+    >>> plt.xlabel('Time') #doctest: +SKIP
  
-    >>> plt.ylabel('Flux') 
+    >>> plt.ylabel('Flux') #doctest: +SKIP
     
 .. image:: images/synthetic_data_plot.png
    :scale: 65 %
@@ -78,11 +78,11 @@ for visualization:
 
     >>> import matplotlib.pyplot as plt
   
-    >>> plt.contourf(wt.taus, wt.nus, wwz, levels=1000, vmin=0, vmax=1000) 
+    >>> plt.contourf(wt.taus, wt.nus, wwz, levels=1000, vmin=0, vmax=1000) #doctest: +SKIP
   
-    >>> plt.xlabel('Time') 
+    >>> plt.xlabel('Time') #doctest: +SKIP
  
-    >>> plt.xlabel('Frequency') 
+    >>> plt.xlabel('Frequency') #doctest: +SKIP
 
 .. image:: images/nu_tau_contour.png
    :scale: 65 %
@@ -131,9 +131,9 @@ frequency:
 
     >>> wt = WaveletTransformer(t_obs, f_obs, c=0.0125)
  
-    >>> print(wt.resolution(1.0)) 
+    >>> print(wt.resolution(1.0)) #doctest: +SKIP
     
     >>> wt_2 = WaveletTransformer(t_obs, f_obs, c=0.00625) #setting c to 1/16pi
     
-    >>> print(wt_2.resolution(1.0)) 
+    >>> print(wt_2.resolution(1.0)) #doctest: +SKIP
     
