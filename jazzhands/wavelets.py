@@ -222,20 +222,14 @@ class WaveletTransformer:
         """
         return 1 / np.inner(weights, weights)
 
-    def _inner_product(self, func1, func2, weights):
+    def _inner_product(self, *arrs):
         """
         Define the inner product of two functions; (4-2) in Foster (1996).
 
         Parameters
         ----------
-        func1 : array-like
-            Values of f at times corresponding to the weights
-
-        func2 : array-like
-            Values of g at times corresponding to the weights
-
-        weights : array-like
-            weights of observations, already calculated
+        arrs : iterable of array-like
+            The arrays to multiply and sum over.
 
         Returns
         -------
@@ -243,7 +237,8 @@ class WaveletTransformer:
             Inner product of func1 and func2
 
         """
-        return np.einsum('i,i,i->', weights, func1, func2)
+        einsum_arg = 'i,' * (len(arrs) - 1) + 'i'
+        return np.einsum(einsum_arg, *[a.flatten() for a in arrs])
 
     def _inner_product_vector(self, func_vals, weights, data):
         """
@@ -291,11 +286,14 @@ class WaveletTransformer:
             S-matrix; size len(func_vals)xlen(func_vals)
 
         """
-        S = np.array([[
-            self._inner_product(func1, func2, weights) for func1 in func_vals
-        ] for func2 in func_vals])
+        l = len(func_vals)
+        S = np.zeros((l, l))
+        for i in range(l):
+            for j in range(i + 1):
+                S[i][j] = self._inner_product(func_vals[i], func_vals[j], weights)
 
-        return np.matrix(S)
+        S = S + S.T - np.diag(S.diagonal())
+        return S
 
     def _calc_coeffs(self, func_vals, weights, data):
         """
@@ -501,7 +499,7 @@ class WaveletTransformer:
                 results = pool.starmap(
                     self._wavelet_transform,
                     args,
-                    chunksize=int(len(self._omegas) * len(self._taus) / 10))
+                    chunksize=len(self._omegas) * len(self._taus) // 10)
 
                 transform = np.array(results).reshape((len(self._omegas),
                                                       len(self._taus), 2))
