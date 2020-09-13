@@ -178,7 +178,7 @@ class WaveletTransformer:
         new_c = float(new_c)
         self._c = new_c
 
-    def _weight_alpha(self, time, omega, tau, c):
+    def _weight_alpha(self, time, omegas, taus, c):
         """
         Weighting function for each point at a given omega and tau; (5-3) in Foster (1996).
 
@@ -187,7 +187,7 @@ class WaveletTransformer:
         time : array-like
             times of observations
 
-        omega : float
+        omega : array-like
             angular frequency in radians per unit time.
 
         tau : float
@@ -237,8 +237,8 @@ class WaveletTransformer:
             Inner product of func1 and func2
 
         """
-        einsum_arg = 'i,' * (len(arrs) - 1) + 'i'
-        return np.einsum(einsum_arg, *[a.flatten() for a in arrs])
+        from functools import reduce
+        return np.sum(reduce(lambda a, b: a * b, arrs))
 
     def _inner_product_vector(self, func_vals, weights, data):
         """
@@ -486,6 +486,7 @@ class WaveletTransformer:
             raise ValueError("Please set omegas or nus or scales")
 
         from tqdm.autonotebook import tqdm
+        from functools import partial
 
         if parallel:
             import multiprocessing as mp
@@ -507,13 +508,33 @@ class WaveletTransformer:
                 wwa = transform[:, :, 1]
 
         else:
-            transform = np.array([[
-                self._wavelet_transform(exclude, tau, omega)
-                for omega in self._omegas
-            ] for tau in tqdm(self._taus)])
+            vectorized_experiment = True
+            
+            if vectorized_experiment:
+                omegas, taus, time = np.meshgrid(self._omegas, self._taus, self._time)
+                zvals_grid = omegas * (time - taus)
+                weights_grid = np.exp(-self._c * np.power(zvals_grid, 2.))
+                weights_grid /= weights_grid.sum(axis=-1)[:,:,np.newaxis]
+                npoints = 1 / np.sum(weights_grid ** 2, axis=-1)
+                func_vals = np.array([np.apply_along_axis(func, -1, zvals_grid) for func in [lambda z: np.ones(z.shape), np.sin, np.cos]])
+                f1_vals = np.ones_like(zvals_grid)
+                get_wvar_x = lambda weights: self._weight_var_x(f1_vals[0][0], weights, self._data)
+                get_wvar_y = lambda weights: self._weight_var_y(func_vals, f1_vals, weights, self._data)
+                x_var = np.apply_along_axis(get_wvar_x, -1, weights_grid)
+                y_var, y_coeff = np.apply_along_axis(get_wvar_y, -1, weights_grid)
+                y_coeff_rows = y_coeff[0]
 
-            wwz = transform[:, :, 0].T
-            wwa = transform[:, :, 1].T
+                wwz = ((num_pts - 3.0) * y_var) / (2.0 * (x_var - y_var))
+                wwa = np.sqrt(np.power(y_coeff_rows[1], 2.0) + np.power(y_coeff_rows[2], 2.0))
+
+            else:
+                transform = np.array([[
+                    self._wavelet_transform(exclude, tau, omega)
+                    for omega in self._omegas
+                ] for tau in tqdm(self._taus)])
+
+                wwz = transform[:, :, 0].T
+                wwa = transform[:, :, 1].T
 
         return wwz, wwa
 
