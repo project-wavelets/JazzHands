@@ -83,6 +83,7 @@ class WaveletsTest(unittest.TestCase):
         wwz, wwa = transformer.compute_wavelet()
         wwz_check = slow_wwz_and_checks(t, x, omegas, taus, c)
         
+        print(wwz, '\n', wwz_check)
         assert np.allclose(wwz, wwz_check)
 
     # def test_omegas_taus_from_min_max_nu(self):
