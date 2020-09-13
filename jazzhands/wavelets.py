@@ -178,7 +178,7 @@ class WaveletTransformer:
         new_c = float(new_c)
         self._c = new_c
 
-    def _weight_alpha(self, time, omegas, taus, c):
+    def _weight_alpha(self, time, omega, tau, c):
         """
         Weighting function for each point at a given omega and tau; (5-3) in Foster (1996).
 
@@ -372,8 +372,8 @@ class WaveletTransformer:
             The coefficients returned by `coeffs`
         """
         y_coeffs = self._calc_coeffs(func_vals, weights, data)
-
-        return y_coeffs.dot(func_vals), y_coeffs
+        y_fit = np.tensordot(y_coeffs, func_vals, axes=1)
+        return y_fit, y_coeffs
 
     def _weight_var_y(self, func_vals, f1_vals, weights, data):
         """
@@ -519,13 +519,16 @@ class WaveletTransformer:
                 func_vals = np.array([np.apply_along_axis(func, -1, zvals_grid) for func in [lambda z: np.ones(z.shape), np.sin, np.cos]])
                 f1_vals = np.ones_like(zvals_grid)
                 get_wvar_x = lambda weights: self._weight_var_x(f1_vals[0][0], weights, self._data)
-                get_wvar_y = lambda weights: self._weight_var_y(func_vals, f1_vals, weights, self._data)
+                get_wcoeff_y = lambda weights: self._calc_coeffs(func_vals, weights, self._data)
                 x_var = np.apply_along_axis(get_wvar_x, -1, weights_grid)
-                y_var, y_coeff = np.apply_along_axis(get_wvar_y, -1, weights_grid)
-                y_coeff_rows = y_coeff[0]
+                y_coeffs = np.apply_along_axis(get_wcoeff_y, -1, weights_grid)
+                y_fit = np.tensordot(y_coeffs, func_vals, axes=1)
+                get_wvar_y = lambda weights: self._inner_product(y_fit, y_fit, weights) - np.power(self._inner_product(f1_vals, y_fit, weights), 2.0)
 
-                wwz = ((num_pts - 3.0) * y_var) / (2.0 * (x_var - y_var))
-                wwa = np.sqrt(np.power(y_coeff_rows[1], 2.0) + np.power(y_coeff_rows[2], 2.0))
+                y_var = np.apply_along_axis(get_wvar_y, -1, weights_grid)
+                
+                wwz = ((npoints - 3.0) * y_var) / (2.0 * (x_var - y_var))
+                wwa = np.sqrt(np.power(y_coeffs[:,:,0,1], 2.0) + np.power(y_coeffs[:,:,0,2], 2.0))
 
             else:
                 transform = np.array([[
