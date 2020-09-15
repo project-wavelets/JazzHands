@@ -12,7 +12,7 @@ __all__ = ['WaveletTransformer']
 class WaveletTransformer:
     """
     Calculate the Weighted Wavelet Transform of the data `y`, measured at
-    times `t`, evaluated at a wavelet scale $\omega$ and shift $\tau$, for a
+    times `t`, evaluated at a wavelet scale omega and shift tau, for a
     decay factor of the Gaussian envelope `c`. Adapted from (5-11) in Foster (1996).
 
     Parameters
@@ -202,7 +202,8 @@ class WaveletTransformer:
             Statistical weights of data points
 
         """
-        return np.exp(-c * np.power(omega * (time - tau), 2.0))
+        weights = np.exp(-c * np.power(omega * (time - tau), 2.0))
+        return weights / np.sum(weights)
 
     def _n_points(self, weights):
         """
@@ -219,22 +220,16 @@ class WaveletTransformer:
             Effective number of data points
 
         """
-        return np.power(np.sum(weights), 2.0) / np.sum(np.power(weights, 2.0))
+        return 1 / np.inner(weights, weights)
 
-    def _inner_product(self, func1, func2, weights):
+    def _inner_product(self, *arrs):
         """
         Define the inner product of two functions; (4-2) in Foster (1996).
 
         Parameters
         ----------
-        func1 : array-like
-            Values of f at times corresponding to the weights
-
-        func2 : array-like
-            Values of g at times corresponding to the weights
-
-        weights : array-like
-            weights of observations, already calculated
+        arrs : iterable of array-like
+            The arrays to multiply and sum over.
 
         Returns
         -------
@@ -242,7 +237,8 @@ class WaveletTransformer:
             Inner product of func1 and func2
 
         """
-        return np.sum(weights * func1 * func2) / np.sum(weights)
+        einsum_arg = 'i,' * (len(arrs) - 1) + 'i'
+        return np.einsum(einsum_arg, *[a.flatten() for a in arrs])
 
     def _inner_product_vector(self, func_vals, weights, data):
         """
@@ -290,15 +286,18 @@ class WaveletTransformer:
             S-matrix; size len(func_vals)xlen(func_vals)
 
         """
-        S = np.array([[
-            self._inner_product(func1, func2, weights) for func1 in func_vals
-        ] for func2 in func_vals])
+        l = len(func_vals)
+        S = np.zeros((l, l))
+        for i in range(l):
+            for j in range(i + 1):
+                S[i][j] = self._inner_product(func_vals[i], func_vals[j], weights)
 
-        return np.matrix(S)
+        S = S + S.T - np.diag(S.diagonal())
+        return S
 
     def _calc_coeffs(self, func_vals, weights, data):
         """
-        Calculate the coefficients of each $\phi$. Adapted from (4-4) in Foster (1996).
+        Calculate the coefficients of each phi. Adapted from (4-4) in Foster (1996).
 
         Parameters
         ----------
@@ -455,7 +454,7 @@ class WaveletTransformer:
     def compute_wavelet(self, exclude=True, parallel=False, n_processes=False):
         """
         Calculate the Weighted Wavelet Transform of the object. Note that this
-        can be incredibly slow for a large enough light curve and a dense
+        can be incredibly slow for a large enough data array and a dense
         enough grid of omegas and taus, so we include multiprocessing to speed
         it up. You can update the omega/nu/scale and tau grids if you
         initialized the `WaveletTransformer` object with them, or set them now
@@ -491,7 +490,7 @@ class WaveletTransformer:
         if parallel:
             import multiprocessing as mp
 
-            n_processes = multiprocessing.cpu_count() - 1 if n_processes is None else n_processes
+            n_processes = mp.cpu_count() - 1 if n_processes is None else n_processes
 
             args = np.array([[exclude, tau, omega] for omega in self._omegas
                              for tau in tqdm(self._taus)])
@@ -500,10 +499,10 @@ class WaveletTransformer:
                 results = pool.starmap(
                     self._wavelet_transform,
                     args,
-                    chunksize=int(len(self._omegas) * len(self._taus) / 10))
+                    chunksize=len(self._omegas) * len(self._taus) // 10)
 
-                transform = np.array(results).reshape(len(self._omegas),
-                                                      len(self._taus), 2)
+                transform = np.array(results).reshape((len(self._omegas),
+                                                      len(self._taus), 2))
                 wwz = transform[:, :, 0]
                 wwa = transform[:, :, 1]
 
