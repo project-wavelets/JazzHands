@@ -511,33 +511,27 @@ class WaveletTransformer:
             vectorized_experiment = True
             
             if vectorized_experiment:
-                omegas, taus, time = np.meshgrid(self._omegas, self._taus, self._time)
+                omegas, taus, time = np.meshgrid(self._omegas, self._taus, self._time, indexing='ij')
                 zvals_grid = omegas * (time - taus)
                 weights_grid = np.exp(-self._c * np.power(zvals_grid, 2.))
                 weights_grid /= weights_grid.sum(axis=-1)[:,:,np.newaxis]
                 npoints = 1 / np.sum(weights_grid ** 2, axis=-1)
+                # checked up to here
                 
-                func_vals = np.array([np.apply_along_axis(func, -1, zvals_grid) for func in [lambda z: np.ones(z.shape), np.sin, np.cos]])
-                f1_vals = np.ones_like(zvals_grid)
-                get_wvar_x = lambda weights: self._weight_var_x(f1_vals[0][0], weights, self._data)
-                get_wcoeff_y = lambda weights: self._calc_coeffs(func_vals, weights, self._data)
-                x_var = np.apply_along_axis(get_wvar_x, -1, weights_grid).T
-
+                func_vals = np.array([func(zvals_grid) for func in [lambda z: np.ones(z.shape), np.sin, np.cos]])
+                
+                f1_vals = func_vals[0]
+                get_wvar_x = lambda weights: self._weight_var_x(f1_vals[0,0], weights, self._data)
+                get_wcoeff_y = lambda weights: self._calc_coeffs(func_vals, weights, self._data).flatten()
+                x_var = np.apply_along_axis(get_wvar_x, -1, weights_grid)
+                
                 y_coeffs = np.apply_along_axis(get_wcoeff_y, -1, weights_grid)
-                y_fit = np.tensordot(y_coeffs, func_vals, axes=1)
-                y_fit_alt = np.array([[
-                    self._y_fit(func_vals, weights_grid[i][j], self._data) for i in range(len(self._omegas))
-                ] for j in range(len(self._taus))])
-
+                y_fit = np.einsum('jki,ijkl->jkl', y_coeffs, func_vals)
                 get_wvar_y = lambda weights: self._inner_product(y_fit, y_fit, weights) - np.power(self._inner_product(f1_vals, y_fit, weights), 2.0)
-                y_var = np.apply_along_axis(get_wvar_y, -1, weights_grid).T
-                y_var_alt = np.array([[
-                    self._weight_var_y(func_vals, f1_vals, weights_grid[i][j], self._data)[0] for i in range(len(self._omegas))
-                ] for j in range(len(self._taus))])
-                print(y_var, '\n', y_var_alt)
+                y_var = np.apply_along_axis(get_wvar_y, -1, weights_grid)
                 
                 wwz = ((npoints - 3.0) * y_var) / (2.0 * (x_var - y_var))
-                wwa = np.sqrt(np.power(y_coeffs[:,:,0,1], 2.0) + np.power(y_coeffs[:,:,0,2], 2.0))
+                wwa = np.sqrt(np.power(y_coeffs[:,:,1], 2.0) + np.power(y_coeffs[:,:,2], 2.0))
 
             else:
                 transform = np.array([[

@@ -33,7 +33,7 @@ class WaveletsTest(unittest.TestCase):
             return t, x
 
         t, x = make_test_time_signal()
-        omegas = [1.1, 1.4]
+        omegas = [1.1, 1.4, 1.8, 2.0]
         taus = [0.0, 0.5]
         c = 1 / (8 * np.pi ** 2)
 
