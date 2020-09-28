@@ -53,7 +53,7 @@ class WaveletsTest(unittest.TestCase):
             for i, omega in enumerate(omegas):
                 for j, tau in enumerate(taus):
                     zs = omega * (t - tau)
-                    basis_functions = [lambda z: np.ones(np.shape(z)), np.sin, np.cos]
+                    basis_functions = [np.ones_like, np.sin, np.cos]
                     basis_evals = np.array([f(zs) for f in basis_functions])
                     weights = np.exp(-c * zs ** 2)
                     weights /= np.sum(weights)
@@ -73,6 +73,7 @@ class WaveletsTest(unittest.TestCase):
                     
                     vx = np.sum(weights * x * x) - np.dot(weights, x) ** 2
                     vy = np.sum(weights * y * y) - np.dot(weights, y) ** 2
+                    
                     assert np.isclose(vx, transformer._weight_var_x(np.ones(len(x)), weights, x))
                     assert np.isclose(vy, transformer._weight_var_y(basis_evals, np.ones(len(x)), weights, x)[0])
 

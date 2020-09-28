@@ -402,6 +402,7 @@ class WaveletTransformer:
             Coefficients from `coeffs`
 
         """
+        assert func_vals.shape == (3, len(data))
         y_f, y_coeffs = self._y_fit(func_vals, weights, data)
 
         return self._inner_product(y_f, y_f, weights) - np.power(
@@ -451,7 +452,7 @@ class WaveletTransformer:
         return ((num_pts - 3.0) * y_var) / (2.0 * (x_var - y_var)), np.sqrt(
             np.power(y_coeff_rows[1], 2.0) + np.power(y_coeff_rows[2], 2.0))
 
-    def compute_wavelet(self, exclude=True, parallel=False, n_processes=False):
+    def compute_wavelet(self, exclude=True, parallel=False, n_processes=False, vectorized=True):
         """
         Calculate the Weighted Wavelet Transform of the object. Note that this
         can be incredibly slow for a large enough data array and a dense
@@ -507,28 +508,48 @@ class WaveletTransformer:
                 wwz = transform[:, :, 0]
                 wwa = transform[:, :, 1]
 
-        else:
-            vectorized_experiment = True
-            
-            if vectorized_experiment:
+        else: 
+            if vectorized:
                 omegas, taus, time = np.meshgrid(self._omegas, self._taus, self._time, indexing='ij')
                 zvals_grid = omegas * (time - taus)
                 weights_grid = np.exp(-self._c * np.power(zvals_grid, 2.))
                 weights_grid /= weights_grid.sum(axis=-1)[:,:,np.newaxis]
                 npoints = 1 / np.sum(weights_grid ** 2, axis=-1)
-                # checked up to here
                 
-                func_vals = np.array([func(zvals_grid) for func in [lambda z: np.ones(z.shape), np.sin, np.cos]])
+                func_vals = np.array([func(zvals_grid) for func in [np.ones_like, np.sin, np.cos]])
                 
                 f1_vals = func_vals[0]
                 get_wvar_x = lambda weights: self._weight_var_x(f1_vals[0,0], weights, self._data)
-                get_wcoeff_y = lambda weights: self._calc_coeffs(func_vals, weights, self._data).flatten()
                 x_var = np.apply_along_axis(get_wvar_x, -1, weights_grid)
-                
-                y_coeffs = np.apply_along_axis(get_wcoeff_y, -1, weights_grid)
+
+                S_matrices = np.array([[self._S_matrix(func_vals[:,i,j,:], weights_grid[i,j]) for j in range(len(self._taus))] for i in range(len(self._omegas))])
+                phis = np.array([[self._inner_product_vector(func_vals[:,i,j,:], weights_grid[i,j], self._data) for j in range(len(self._taus))] for i in range(len(self._omegas))])
+                y_coeffs = np.array([[np.linalg.solve(S_matrices[i,j], phis[i,j]).T[0] for j in range(len(self._taus))] for i in range(len(self._omegas))])
                 y_fit = np.einsum('jki,ijkl->jkl', y_coeffs, func_vals)
-                get_wvar_y = lambda weights: self._inner_product(y_fit, y_fit, weights) - np.power(self._inner_product(f1_vals, y_fit, weights), 2.0)
-                y_var = np.apply_along_axis(get_wvar_y, -1, weights_grid)
+                
+                get_wvar_y = lambda weights, fit_vals: self._inner_product(fit_vals, fit_vals, weights) - np.power(self._inner_product(fit_vals, weights), 2.0)
+                y_var = np.array([[get_wvar_y(weights_grid[i,j], y_fit[i,j]) for j in range(len(self._taus))] for i in range(len(self._omegas))])
+
+                # dinosaur
+                for i, omega in enumerate(self._omegas):
+                    for j, tau in enumerate(self._taus):
+                        assert np.isclose(self._n_points(weights_grid[i][j]), npoints[i][j])
+                        weight_vector = self._weight_alpha(self._time, omega, tau, self._c)
+                        z = omega * (self._time - tau)
+                        local_func_vals = np.array([np.ones_like(z), np.sin(z), np.cos(z)])
+                        assert np.allclose(func_vals[:,i,j,:], local_func_vals)
+                        assert np.allclose(weight_vector, weights_grid[i][j])
+                        assert np.allclose(get_wvar_x(weights_grid[i][j]), self._weight_var_x(np.ones_like(self._time), weight_vector, self._data))
+                        assert np.allclose(get_wvar_x(weights_grid[i][j]), x_var[i][j])
+                        assert np.allclose(S_matrices[i,j], self._S_matrix(local_func_vals, weight_vector))
+                        local_coeffs = self._calc_coeffs(local_func_vals, weight_vector, self._data)
+                        assert np.allclose(y_coeffs[i,j], local_coeffs)
+                        local_fit = np.tensordot(local_coeffs, local_func_vals, axes=1)
+                        local_yvar = self._weight_var_y(local_func_vals, np.ones_like(self._data), weight_vector, self._data)[0]
+                        local_yvar_2 = self._inner_product(local_fit, local_fit, weight_vector) - np.power(self._inner_product(local_fit, weight_vector), 2.0)
+                        assert np.allclose(local_fit, y_fit[i,j])
+                        assert np.isclose(local_yvar, local_yvar_2)
+                        assert np.isclose(local_yvar, y_var[i,j])                   
                 
                 wwz = ((npoints - 3.0) * y_var) / (2.0 * (x_var - y_var))
                 wwa = np.sqrt(np.power(y_coeffs[:,:,1], 2.0) + np.power(y_coeffs[:,:,2], 2.0))
