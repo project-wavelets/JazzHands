@@ -77,7 +77,9 @@ except Exception:
 setup(
     name="jazz-hands",
     install_requires=[
-        'pytest'
+        'pytest>=6.0.1',
+        'numpy>=1.19.1',
+        'astropy>=4.0.1'
     ],
     use_scm_version={'write_to': os.path.join('jazzhands', 'version.py'),
                        'write_to_template': VERSION_TEMPLATE},
