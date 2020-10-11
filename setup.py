@@ -79,7 +79,7 @@ setup(
     install_requires=[
         'pytest>=6.0.1',
         'extension-helpers>=0.1',
-        'astropy>=4.0.1'
+        'astropy'
     ],
     use_scm_version={'write_to': os.path.join('jazzhands', 'version.py'),
                        'write_to_template': VERSION_TEMPLATE},
