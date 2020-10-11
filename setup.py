@@ -78,7 +78,7 @@ setup(
     name="jazz-hands",
     install_requires=[
         'pytest>=6.0.1',
-        'numpy>=1.19.1',
+        'extension-helpers>=0.1',
         'astropy>=4.0.1'
     ],
     use_scm_version={'write_to': os.path.join('jazzhands', 'version.py'),
