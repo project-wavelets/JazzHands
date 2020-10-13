@@ -51,10 +51,10 @@ account for time-of-arrival differences along the spacecraft orbit induce
 sampling irregularities. Interpolative methods may be used to offset these 
 effects, but introduce their own systematics into the wavelet transform.
 
-`@foster96` introduced a mathematical formulation of the wavelet transform 
+@foster96 introduced a mathematical formulation of the wavelet transform 
 using the Morlet wavelet that accounts for the effects of irregular sampling 
 and gaps, and avoids the need for interpolation. `JazzHands` is the first 
-open-source Python implementation of the `@foster96` method, and has already
+open-source Python implementation of the @foster96 method, and has already
 been used in scientific applications [@dornwallenstein20b]. The combination of
 speed, customizability, and helpful features for users who are new to wavelet 
 analysis will enable exciting new science on the wealth of high precision light
