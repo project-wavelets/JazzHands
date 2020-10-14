@@ -13,9 +13,9 @@ authors:
   - name: Aditya R. Sengupta
     orcid: 0000-0002-5669-035X
     affiliation: "2"
-  - name: Author 2
-    orcid: XXXX-XXXX-XXXX-XXXX
-    affiliation: "3, 4"
+  - name: James S. Kuszlewicz
+    orcid: 0000-0002-3322-5279
+    affiliation: "3"
   - name: Author 3
     affiliation: 3
   - name: Author 4
@@ -26,7 +26,7 @@ affiliations:
    index: 1
  - name: University of California, Berkeley
    index: 2
- - name: Institution Name
+ - name: Heidelberg Institute for Theoretical Studies
    index: 3
  - name: Independent Researcher
    index: 4
