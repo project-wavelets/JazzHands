@@ -2,7 +2,7 @@
 import numpy as np
 from tqdm import tqdm
 import time
-np.random.seed(sum(map(ord, "wavelets are cool!")))
+# np.random.seed(sum(map(ord, "wavelets are cool!")))
 
 from jazzhands import wavelets
 
