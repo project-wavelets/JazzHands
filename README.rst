@@ -15,7 +15,7 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
 
 .. image:: https://codecov.io/gh/avivajpeyi/JazzHands/branch/testing/graph/badge.svg
   :target: https://codecov.io/gh/avivajpeyi/JazzHands
-  
+
 .. image:: https://readthedocs.org/projects/jazzhands/badge/?version=latest
   :target: https://jazzhands.readthedocs.io/en/latest/?badge=latest
 
@@ -25,7 +25,7 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
 Authors
 -------
 
-This project is made by Trevor Dorn-Wallenstein, Amogh Desai(@theand9), Greg Gilbert (@gjgilbert), Athul R T (@athulvis), Teresa Monsue (@astroluv) YOUR NAME HERE
+This project is made by Trevor Dorn-Wallenstein, Amogh Desai(@theand9), Greg Gilbert (@gjgilbert), Athul R T (@athulvis), Teresa Monsue (@astroluv), Aditya Sengupta (@aditya-sengupta), YOUR NAME HERE
 
 Documentation
 -------------
