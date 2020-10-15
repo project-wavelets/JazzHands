@@ -16,8 +16,8 @@ authors:
   - name: James S. Kuszlewicz
     orcid: 0000-0002-3322-5279
     affiliation: "3"
-  - name: Author 3
-    affiliation: 3
+  - name: Athul R. T.
+    affiliation: "4"
   - name: Author 4
     affiliation: 3
 
@@ -28,7 +28,7 @@ affiliations:
    index: 2
  - name: Heidelberg Institute for Theoretical Studies
    index: 3
- - name: Independent Researcher
+ - name: Cochin University of Science and Technology
    index: 4
 date: XX October 2020
 bibliography: paper.bib
