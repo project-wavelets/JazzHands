@@ -73,7 +73,7 @@ further defined and clarified by project maintainers.
 ### Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at [INSERT EMAIL ADDRESS]. All
+reported by contacting the project team at `jazzhandsdev@gmail.com`. All
 complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.
@@ -87,7 +87,7 @@ members of the project's leadership.
 Here we document the steps taken when creating a new release
 
 #### Release manager roles
-- Tag MRs to create a flow for releases (`$ git tag -a v1.4 -m "my version 1.4"`)
+- Load MRs to create a flow for releases 
 - Prompt developers to fix up issues and respond to comments
 - Create the release PR
 - Merge in PRs as they get approved
@@ -95,18 +95,21 @@ Here we document the steps taken when creating a new release
 - Present updates on the development call about MRs and your planned release cycle 
 
 #### Preparation
-1. Tag all PRs which are part of the release using a relevantly named milestone.
+1. Label all PRs which are part of the release using a relevantly named milestone.
 2. Make sure all the PRs for the release are merged and the CI is passing.
-3. Create a PRs which updates the version number defined in `setup.py` and update the CHANGELOG. Commit the changes with a message "Version X.Y.Z release" and merge to master.
+3. Create a PR with updates in the CHANGELOG. Commit the changes with a message "Version X.Y.Z release" and merge to `main`.
 
 #### Automated release
-1. Once the PR is merged into master, create a tag on github.com/jazzhands following the versioning convention specified [here](https://www.python.org/dev/peps/pep-0440/). This will create a CI job which pushes to pypi using the credentials stored online.
+Once the PR is merged into `main`, create a release with a `tag` on the [release page](https://github.com/project-wavelets/JazzHands/releases/new).
+The `tag` should follow versioning convention specified [here](https://www.python.org/dev/peps/pep-0440/). 
+This will create a CI job which pushes the release to pypi using the credentials stored online.
 
 ## Manual release (not recommended)
-0. Tag the commit with the correct version and push the tag
-1. Verify that `$ python setup.py --version` is a valid version 
-2. Run `$ python setup.py sdist` - this will create a file `dist/PACKAGENAME-VERSION.tar.gz`
-3. Run `$ twine upload dist/PACKAGENAME-VERSION.tar.gz` (username is [JazzHandsDev])
+0. Tag the current version `$ git tag -a v1.4 -m "my version 1.4"`
+1. Push tag to the main repository (not your fork) `$ git push origin --tags`
+2. Verify that `$ python setup.py --version` is a valid version (something like `v0.0.0`)
+3. Run `$ python setup.py sdist` - this will create a file `dist/PACKAGENAME-VERSION.tar.gz`
+4. Run `$ twine upload dist/PACKAGENAME-VERSION.tar.gz` (username is [JazzHandsDev])
 
 
 ### Attribution
