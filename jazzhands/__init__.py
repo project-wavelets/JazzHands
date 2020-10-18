@@ -7,9 +7,10 @@
 __all__ = []
 from jazzhands.wavelets import *  # noqa
 from jazzhands.utils import *
+from jazzhands.version import version
 # Then you can be explicit to control what ends up in the namespace,
 # or you can keep everything from the subpackage with the following instead
 __all__ += wavelets.__all__
 
 #Version number
-__version__ = '0.0.1'
+__version__ = version

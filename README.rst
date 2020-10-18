@@ -5,13 +5,9 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
-.. image:: https://github.com/avivajpeyi/JazzHands/workflows/doctest%20%F0%9F%A7%AA/badge.svg
-    :target: https://github.com/avivajpeyi/JazzHands/actions
-    :alt: doctest 🧪
-
-.. image:: https://github.com/avivajpeyi/JazzHands/workflows/testing%20%F0%9F%A7%AA/badge.svg
-    :target: https://github.com/avivajpeyi/JazzHands/actions
-    :alt: testing 🧪
+.. image:: https://github.com/project-wavelets/JazzHands/workflows/Testing%20%F0%9F%A7%AA/badge.svg
+    :target: https://github.com/project-wavelets/JazzHands/actions
+    :alt: Testing 🧪
 
 .. image:: https://codecov.io/gh/avivajpeyi/JazzHands/branch/testing/graph/badge.svg
   :target: https://codecov.io/gh/avivajpeyi/JazzHands
@@ -19,6 +15,17 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
 .. image:: https://readthedocs.org/projects/jazzhands/badge/?version=latest
   :target: https://jazzhands.readthedocs.io/en/latest/?badge=latest
 
+.. image:: https://img.shields.io/pypi/v/jazz-hands
+    :target: https://pypi.org/project/jazz-hands/
+    :alt: PyPi release
+
+.. image::https://img.shields.io/pypi/dm/jazz-hands
+    :target: https://img.shields.io/pypi/dm/jazz-hands
+    :alt: Number of PyPI downloads
+
+.. image::https://img.shields.io/github/contributors/project-wavelets/jazzhands
+    :target: https://github.com/project-wavelets/JazzHands/graphs/contributors
+    :alt: Number of code contributers
 
 
 
@@ -26,6 +33,13 @@ Authors
 -------
 
 This project is made by Trevor Dorn-Wallenstein, Amogh Desai(@theand9), Greg Gilbert (@gjgilbert), Athul R T (@athulvis), Teresa Monsue (@astroluv) YOUR NAME HERE
+
+Installation
+------------
+
+```
+pip install jazz-hands
+```
 
 Documentation
 -------------
@@ -46,7 +60,8 @@ Contributing
 ------------
 
 We love contributions! JazzHands is open source,
-built on open source, and we'd love to have you hang out in our community.
+built on open source, and we'd love to have you hang out in our community. Technical
+notes on contributing present here.
 
 **Imposter syndrome disclaimer**: We want your help. No, really.
 

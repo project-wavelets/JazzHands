@@ -2,7 +2,7 @@ name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
 on:
   push:
     # Sequence of patterns matched against refs/heads
-    branches:    
+    branches:
       # Push events on main branch
       - main
     # Sequence of patterns matched against refs/tags
@@ -27,5 +27,7 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
+        python setup.py --version
         python setup.py sdist bdist_wheel
         twine upload dist/*
+
