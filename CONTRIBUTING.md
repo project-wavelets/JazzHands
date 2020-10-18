@@ -100,11 +100,13 @@ Here we document the steps taken when creating a new release
 3. Create a PRs which updates the version number defined in `setup.py` and update the CHANGELOG. Commit the changes with a message "Version X.Y.Z release" and merge to master.
 
 #### Automated release
-1. Once the PR is merged into master, create a tag on github.com/jazzhands following the standard naming convention. This will create a CI job which pushes to pypi using the credentials stored online.
+1. Once the PR is merged into master, create a tag on github.com/jazzhands following the versioning convention specified [here](https://www.python.org/dev/peps/pep-0440/). This will create a CI job which pushes to pypi using the credentials stored online.
 
 ## Manual release (not recommended)
-1. Run `$ python setup.py sdist` - this will create a file `dist/PACKAGENAME-VERSION.tar.gz`
-2. Run `$ twine upload dist/PACKAGENAME-VERSION.tar.gz` (username is [JazzHandsDev])
+0. Tag the commit with the correct version and push the tag
+1. Verify that `$ python setup.py --version` is a valid version 
+2. Run `$ python setup.py sdist` - this will create a file `dist/PACKAGENAME-VERSION.tar.gz`
+3. Run `$ twine upload dist/PACKAGENAME-VERSION.tar.gz` (username is [JazzHandsDev])
 
 
 ### Attribution

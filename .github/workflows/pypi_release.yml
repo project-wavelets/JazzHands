@@ -4,7 +4,7 @@ on:
     # Sequence of patterns matched against refs/heads
     branches:
       # Push events on main branch
-      - release_job
+      - main
     # Sequence of patterns matched against refs/tags
     tags:        
       - v*             # Push events to v* tag
@@ -27,6 +27,7 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
+        python setup.py --version
         python setup.py sdist bdist_wheel
         twine upload dist/*
 
