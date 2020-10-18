@@ -1,5 +1,0 @@
-pytest>=6.0.1
-extension_helpers>=0.1
-numpy>=1.19.1
-pytest-cov>=2.10.1
-pytest-doctestplus>=0.8.0
