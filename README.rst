@@ -19,11 +19,11 @@ Your one-stop-shop for quick computations with wavelets (aka little waves, aka j
     :target: https://pypi.org/project/jazz-hands/
     :alt: PyPi release
 
-.. image::https://img.shields.io/pypi/dm/jazz-hands
+.. image:: https://img.shields.io/pypi/dm/jazz-hands
     :target: https://img.shields.io/pypi/dm/jazz-hands
     :alt: Number of PyPI downloads
 
-.. image::https://img.shields.io/github/contributors/project-wavelets/jazzhands
+.. image:: https://img.shields.io/github/contributors/project-wavelets/jazzhands
     :target: https://github.com/project-wavelets/JazzHands/graphs/contributors
     :alt: Number of code contributers
 
@@ -37,9 +37,14 @@ This project is made by Trevor Dorn-Wallenstein, Amogh Desai(@theand9), Greg Gil
 Installation
 ------------
 
-```
-pip install jazz-hands
-```
+You can install jazz-hands from pip using::
+
+    pip install jazz-hands
+
+To use jazz-hands, you can import it into python with::
+
+    import jazzhands
+
 
 Documentation
 -------------
