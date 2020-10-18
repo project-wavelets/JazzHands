@@ -75,9 +75,6 @@ except Exception:
 """.lstrip()
 
 setup(
-    install_requires=[
-        'pytest'
-    ],
     use_scm_version={'write_to': os.path.join('jazzhands', 'version.py'),
-                       'write_to_template': VERSION_TEMPLATE}
+                       'write_to_template': VERSION_TEMPLATE},
 )
