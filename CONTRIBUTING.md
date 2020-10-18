@@ -87,7 +87,7 @@ members of the project's leadership.
 Here we document the steps taken when creating a new release
 
 #### Release manager roles
-- Tag MRs to create a flow for releases
+- Tag MRs to create a flow for releases (`$ git tag -a v1.4 -m "my version 1.4"`)
 - Prompt developers to fix up issues and respond to comments
 - Create the release PR
 - Merge in PRs as they get approved
