@@ -42,6 +42,8 @@ conf = ConfigParser()
 
 conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
 setup_cfg = dict(conf.items('metadata'))
+#Trevor fix here for docs:
+setup_cfg['name'] = 'jazzhands'
 
 # -- General configuration ----------------------------------------------------
 
