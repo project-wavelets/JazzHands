@@ -19,6 +19,9 @@ authors:
   - name: Athul R. T.
     orcid: 0000-0001-5565-7470
     affiliation: "4"
+  - name: Avi Vajpeyi
+    orcid: 0000-0002-4146-1132
+    affiliation: "5, 6"
   - name: Author 4
     affiliation: 3
 
@@ -31,6 +34,11 @@ affiliations:
    index: 3
  - name: Cochin University of Science and Technology
    index: 4
+ - name: School of Physics and Astronomy, Monash University, Vic 3800, Australia
+   index: 5
+ - name: OzGrav: The ARC Centre of Excellence for Gravitational Wave Discovery, Clayton VIC 3800, Australia
+   index: 6
+ 
 date: XX October 2020
 bibliography: paper.bib
 
