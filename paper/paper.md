@@ -22,8 +22,6 @@ authors:
   - name: Avi Vajpeyi
     orcid: 0000-0002-4146-1132
     affiliation: "5, 6"
-  - name: Author 4
-    affiliation: 3
 
 affiliations:
  - name: University of Washington
@@ -36,7 +34,7 @@ affiliations:
    index: 4
  - name: School of Physics and Astronomy, Monash University, Vic 3800, Australia
    index: 5
- - name: OzGrav: The ARC Centre of Excellence for Gravitational Wave Discovery, Clayton VIC 3800, Australia
+ - name: "OzGrav: The ARC Centre of Excellence for Gravitational Wave Discovery, Clayton VIC 3800, Australia"
    index: 6
  
 date: XX October 2020
