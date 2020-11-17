@@ -6,6 +6,7 @@
 
 __all__ = []
 from jazzhands.wavelets import *  # noqa
+from jazzhands import wavelets
 from jazzhands.utils import *
 
 try:
