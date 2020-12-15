@@ -187,7 +187,7 @@ class WaveletTransformer:
         time : array-like
             times of observations
 
-        omega : float
+        omega : array-like
             angular frequency in radians per unit time.
 
         tau : float
@@ -237,8 +237,8 @@ class WaveletTransformer:
             Inner product of func1 and func2
 
         """
-        einsum_arg = 'i,' * (len(arrs) - 1) + 'i'
-        return np.einsum(einsum_arg, *[a.flatten() for a in arrs])
+        from functools import reduce
+        return np.sum(reduce(lambda a, b: a * b, arrs))
 
     def _inner_product_vector(self, func_vals, weights, data):
         """
@@ -290,7 +290,7 @@ class WaveletTransformer:
         S = np.zeros((l, l))
         for i in range(l):
             for j in range(i + 1):
-                S[i][j] = self._inner_product(func_vals[i], func_vals[j], weights)
+                S[i][j] = (func_vals[i] * func_vals[j]).dot(weights)
 
         S = S + S.T - np.diag(S.diagonal())
         return S
@@ -372,8 +372,8 @@ class WaveletTransformer:
             The coefficients returned by `coeffs`
         """
         y_coeffs = self._calc_coeffs(func_vals, weights, data)
-
-        return y_coeffs.dot(func_vals), y_coeffs
+        y_fit = np.tensordot(y_coeffs, func_vals, axes=1)
+        return y_fit, y_coeffs
 
     def _weight_var_y(self, func_vals, f1_vals, weights, data):
         """
@@ -402,6 +402,7 @@ class WaveletTransformer:
             Coefficients from `coeffs`
 
         """
+        assert func_vals.shape == (3, len(data))
         y_f, y_coeffs = self._y_fit(func_vals, weights, data)
 
         return self._inner_product(y_f, y_f, weights) - np.power(
@@ -451,7 +452,7 @@ class WaveletTransformer:
         return ((num_pts - 3.0) * y_var) / (2.0 * (x_var - y_var)), np.sqrt(
             np.power(y_coeff_rows[1], 2.0) + np.power(y_coeff_rows[2], 2.0))
 
-    def compute_wavelet(self, exclude=True, parallel=False, n_processes=False):
+    def compute_wavelet(self, exclude=True, parallel=False, n_processes=False, vectorized=False):
         """
         Calculate the Weighted Wavelet Transform of the object. Note that this
         can be incredibly slow for a large enough data array and a dense
@@ -486,6 +487,7 @@ class WaveletTransformer:
             raise ValueError("Please set omegas or nus or scales")
 
         from tqdm.autonotebook import tqdm
+        from functools import partial
 
         if parallel:
             import multiprocessing as mp
@@ -506,14 +508,68 @@ class WaveletTransformer:
                 wwz = transform[:, :, 0]
                 wwa = transform[:, :, 1]
 
-        else:
-            transform = np.array([[
-                self._wavelet_transform(exclude, tau, omega)
-                for omega in self._omegas
-            ] for tau in tqdm(self._taus)])
+        else: 
+            if vectorized:
+                from scipy.special import softmax
+                omegas, taus, time = np.meshgrid(self._omegas, self._taus, self._time, indexing='ij')
+                zvals_grid = omegas * (time - taus)
+                weights_grid = softmax(-self._c * np.power(zvals_grid, 2.), axis=-1)
+                npoints = 1 / np.sum(weights_grid ** 2, axis=-1)
+                func_vals = np.array([func(zvals_grid) for func in [np.ones_like, np.sin, np.cos]])
+                x_var = weights_grid.dot(self._data ** 2) - (weights_grid.dot(self._data)) ** 2
+                
+                S_matrices = np.array([[self._S_matrix(func_vals[:,i,j,:], weights_grid[i,j]) for j in range(len(self._taus))] for i in range(len(self._omegas))])
+                phis = np.array([[self._inner_product_vector(func_vals[:,i,j,:], weights_grid[i,j], self._data) for j in range(len(self._taus))] for i in range(len(self._omegas))])
 
-            wwz = transform[:, :, 0].T
-            wwa = transform[:, :, 1].T
+                for i, omega in enumerate(tqdm(self._omegas)):
+                    for j, tau in enumerate(self._taus):
+                        local_weights = self._weight_alpha(self._time, omega, tau, self._c)
+                        local_z = omega * (self._time - tau)
+                        local_func_vals = np.array([np.ones_like(local_z), np.sin(local_z), np.cos(local_z)])
+                        local_S = self._S_matrix(local_func_vals, local_weights)
+                        try:
+                            np.linalg.solve(local_S, phis[i,j])
+                        except np.linalg.LinAlgError:
+                            print(i, j, omega, tau)
+                            self._calc_coeffs(local_func_vals, local_weights, self._data)
+                        
+                
+                y_coeffs = np.array([[np.linalg.solve(S_matrices[i,j], phis[i,j]).T[0] for j in range(len(self._taus))] for i in range(len(self._omegas))])
+                y_fit = np.einsum('jki,ijkl->jkl', y_coeffs, func_vals)
+                
+                get_wvar_y = lambda weights, fit_vals: self._inner_product(fit_vals, fit_vals, weights) - np.power(self._inner_product(fit_vals, weights), 2.0)
+                y_var = np.array([[get_wvar_y(weights_grid[i,j], y_fit[i,j]) for j in range(len(self._taus))] for i in range(len(self._omegas))])
+
+                for i, omega in enumerate(self._omegas):
+                    for j, tau in enumerate(self._taus):
+                        assert np.isclose(self._n_points(weights_grid[i][j]), npoints[i][j])
+                        weight_vector = self._weight_alpha(self._time, omega, tau, self._c)
+                        z = omega * (self._time - tau)
+                        local_func_vals = np.array([np.ones_like(z), np.sin(z), np.cos(z)])
+                        assert np.allclose(func_vals[:,i,j,:], local_func_vals)
+                        assert np.allclose(weight_vector, weights_grid[i][j])
+                        assert np.allclose(self._weight_var_x(np.ones_like(self._time), weight_vector, self._data), x_var[i][j])
+                        assert np.allclose(S_matrices[i,j], self._S_matrix(local_func_vals, weight_vector))
+                        local_coeffs = self._calc_coeffs(local_func_vals, weight_vector, self._data)
+                        assert np.allclose(y_coeffs[i,j], local_coeffs)
+                        local_fit = np.tensordot(local_coeffs, local_func_vals, axes=1)
+                        local_yvar = self._weight_var_y(local_func_vals, np.ones_like(self._data), weight_vector, self._data)[0]
+                        local_yvar_2 = self._inner_product(local_fit, local_fit, weight_vector) - np.power(self._inner_product(local_fit, weight_vector), 2.0)
+                        assert np.allclose(local_fit, y_fit[i,j])
+                        assert np.isclose(local_yvar, local_yvar_2)
+                        assert np.isclose(local_yvar, y_var[i,j])  
+                
+                wwz = ((npoints - 3.0) * y_var) / (2.0 * (x_var - y_var))
+                wwa = np.sqrt(np.power(y_coeffs[:,:,1], 2.0) + np.power(y_coeffs[:,:,2], 2.0))
+
+            else:
+                transform = np.array([[
+                    self._wavelet_transform(exclude, tau, omega)
+                    for omega in self._omegas
+                ] for tau in tqdm(self._taus)])
+
+                wwz = transform[:, :, 0].T
+                wwa = transform[:, :, 1].T
 
         return wwz, wwa
 
