@@ -85,6 +85,6 @@ took place globally in 2020 September.
 
 # References
 
-1. Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112, 1709. https://doi.org/10.1086/118137
-2. Torrence, C., & Compo, G. P. (1998). A Practical Guide to Wavelet Analysis. Bulletin of the American Meteorological Society, 79(1), 61–78. https://doi.org/10.1175/1520-0477(1998)079<0061:APGTWA>2.0.CO;2
-3. Dorn-Wallenstein, T. Z., Levesque, E. M., Neugent, K. F., Davenport, J. R. A., Morris, B. M., & Gootkin, K. (2020). Short-term Variability of Evolved Massive Stars with TESS. II. A New Class of Cool, Pulsating Supergiants. The Astrophysical Journal, 902(1), 24. https://doi.org/10.3847/1538-4357/abb318
+1. [@foster96]
+2. [@torrence98]
+3. [@dornwallenstein20b]
