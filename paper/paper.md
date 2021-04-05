@@ -33,7 +33,7 @@ affiliations:
    index: 1
  - name: University of California, Berkeley
    index: 2
- - name: Heidelberg Institute for Theoretical Studies
+ - name: Independent Researcher
    index: 3
  - name: Cochin University of Science and Technology
    index: 4
