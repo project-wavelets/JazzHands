@@ -14,7 +14,11 @@ With conda
 
 To install Jazzhands with released latest version of conda, use the following command::
         
-    conda install jazzhands
+    conda install -c conda-forge jazz-hands
+    
+Make sure that you have added ``conda-forge`` in your conda environment using the command::
+
+    conda config --add channels conda-forge
     
 With pip
 --------
