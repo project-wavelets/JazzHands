@@ -37,9 +37,13 @@ This project is made by Trevor Dorn-Wallenstein, Amogh Desai(@theand9), Greg Gil
 Installation
 ------------
 
-You can install jazz-hands from pip using::
+You can install jazz-hands from `pip` using::
 
     pip install jazz-hands
+    
+or with `conda`::
+
+    conda install -c conda-forge jazz-hands
 
 To use jazz-hands, you can import it into python with::
 
