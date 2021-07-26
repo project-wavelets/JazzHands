@@ -25,8 +25,9 @@ With pip
 
 To install Jazzhands using pip, run the following code::
 
-    pip install jazzhands
+    pip install jazz-hands
     
 Pip will automatically installs the dependency package ``numpy`` also. To install Jazzhands without dependencies, run the code below::
-    pip install --no-deps jazzhands
+
+    pip install --no-deps jazz-hands
 
